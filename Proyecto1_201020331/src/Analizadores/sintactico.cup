@@ -1,0 +1,114 @@
+package Analizadores; 
+
+
+import java_cup.runtime.*; 
+import java.util.ArrayList;
+
+ 
+parser code 
+{: 
+
+//variables utilizadas para el analisis sintactico
+private boolean correcto = false;
+
+
+/**Metodo al que se llama automáticamente ante algún error sintactico.*/ 
+public void syntax_error(Symbol s){ 
+ System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
+} 
+ /**Metodo al que se llama en el momento en que ya no es posible una recuperación de errores.*/ 
+public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+ System.out.println("Error en la Línea " + (s.right+1)+ "Columna "+s.left+". Identificador " + s.value + " no reconocido."); 
+} 
+:} 
+
+terminal tab_abrir, r_configurar, r_figura, r_nombre, r_vida, r_tipo, r_arma, r_bloques, r_bomba, r_bonus, r_enemigo, r_heroe, 
+r_meta, r_destruir, tag_cerrar, llave_abrir, s_igual, atributo_nombre, s_punto_coma, r_imagen, s_comilla_doble, path, entero,
+s_coma, llave_cerrar, s_guion, tag_cerrar;
+
+non terminal INICIO, TAG_ARCHIVO_CONFIGURACION, TAG_CONFIGURACION, ARCHIVO_CONFIGURACION, CONFIGURACION, CONFIGURACION_FONDO, 
+CONFIGURACION_DISEÑO, CONFIGURACION_FIGURA, FONDO, DISEÑO, FIGURA, ATRIBUTO_NOMBRE, ATRIBUTO_VIDA, ATRIBUTO_DESTRUCCION, 
+ATRIBUTO_IMAGEN, ATRIBUTO_TIPO, ATRIBUTO_DESCRIPCION, TIPO, ERROR;
+  
+start with INICIO;  
+
+INICIO ::=  ARCHVO_CONFIGURACION;
+
+ARCHIVO_CONFIGURACION ::= abrir_tag r_configuracion cerrar_tag CONFIGURACION abrir_tag s_guion r_configuracion cerrar_tag;
+
+CONFIGURACION ::=   abrir_tag r_fondo cerrar_tag CONFIGUACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
+					abrir_tag r_diseño cerrar_tag CONFIGURACION_DISEÑO abrir_tag s_guion r_diseño cerrar_tag
+					abrir_tag r_figura cerrar_tag CONFIGURACION_FIGURA abrir_tag s_guion r_figura cerrar_tag
+				   	|abrir_tag r_diseño cerrar_tag CONFIGURACION_DISEÑO abrir_tag s_guion r_diseño cerrar_tag
+				   	abrir_tag r_fondo cerrar_tag CONFIGUACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
+					abrir_tag r_figura cerrar_tag CONFIGURACION_FIGURA abrir_tag s_guion r_figura cerrar_tag
+					|abrir_tag r_figura cerrar_tag CONFIGURACION_FIGURA abrir_tag s_guion r_figura cerrar_tag 
+					abrir_tag r_diseño cerrar_tag CONFIGURACION_DISEÑO abrir_tag s_guion r_diseño cerrar_tag
+				   	abrir_tag r_fondo cerrar_tag CONFIGUACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
+				   	|abrir_tag r_diseño cerrar_tag CONFIGURACION_DISEÑO abrir_tag s_guion r_diseño cerrar_tag
+				   	abrir_tag r_figura cerrar_tag CONFIGURACION_FIGURA abrir_tag s_guion r_figura cerrar_tag
+				   	abrir_tag r_fondo cerrar_tag CONFIGUACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
+				   	|abrir_tag r_fondo cerrar_tag CONFIGUACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
+				   	abrir_tag r_figura cerrar_tag CONFIGURACION_FIGURA abrir_tag s_guion r_figura cerrar_tag
+				   	abrir_tag r_diseño cerrar_tag CONFIGURACION_DISEÑO abrir_tag s_guion r_diseño cerrar_tag;
+
+CONFIGURACION_FONDO ::= llave_abrir FONDO llave_cerrar s_coma CONFIGURACION_FONDO
+						|llave_abrir FONDO llave_cerrar; 
+
+CONFIGURACION_DISEÑO ::= llave_abrir DISEÑO llave_cerrar s_coma CONFIGURACION_DISEÑO
+						|llave_abrir DISEÑO llave_cerrar;
+
+CONFIGURACION_FIGURA ::= llave_abrir FIGURA llave_cerrar s_coma CONFIGURACION_FIGURA
+						|llave_abrir FIGURA llave_cerrar; 
+
+FONDO ::=	r_nombre s_igual nombre s_punto_coma r_imagen s_igual s_comillas nombre s_comillas s_punto_coma
+			|r_imagen s_igual s_comillas nombre s_comillas s_punto_coma r_nombre s_igual nombre s_punto_coma;
+
+FIGURAS ::= ATRIBUTO_NOMBRE FIGURAS
+			|ATRIBUTO_VIDA FIGURAS
+			|ATRIBUTO_DESTRUCCION FIGURAS
+			|ATRIBUTO_IMAGEN FIGURAS
+			|ATRIBUTO_TIPO FIGURAS
+			|ATRIBUTO_DESCRIPCION FIGURAS
+			|ATRIBUTO_NOMBRE
+			|ATRIBUTO_VIDA
+			|ATRIBUTO_DESTRUCCION
+			|ATRIBUTO_IMAGEN
+			|ATRIBUTO_TIPO
+			|ATRITUBO_DESCRIPCION;
+
+DISEÑO :: =  ATRIBUTO_NOMBRE DISEÑO
+			|ATRIBUTO_VIDA DISEÑO
+			|ATRIBUTO_DESTRUCCION DISEÑO
+			|ATRIBUTO_IMAGEN DISEÑO
+			|ATRIBUTO_TIPO DISEÑO
+			|ATRIBUTO_DESCRIPCION DISEÑO
+			|ATRIBUTO_NOMBRE
+			|ATRIBUTO_VIDA
+			|ATRIBUTO_DESTRUCCION
+			|ATRIBUTO_IMAGEN
+			|ATRIBUTO_TIPO
+			|ATRITUBO_DESCRIPCION;
+				   	
+ATRIBUTO_NOMBRE ::= r_nombre s_igual nombre s_punto_coma;
+
+ATRIBUTO_DESTRUIR ::= r_destruir s_igual numero s_punto_coma;
+
+ATRIBUTO_VIDA ::= r_vida s_igual vida s_punto_coma;
+
+ATRIBUTO_IMAGEN ::= r_imagen s_igual s_comillas path s_comillas s_punto_coma;
+
+ATRIBUTO_TIPO  ::= r_tipo s_igual TIPO s_punto_coma;
+
+ATRIBUTO_DSCRIPCION ::= r_descripcion s_igual s_comillas nombre s_comillas;
+
+TIPO ::= 	r_heroe
+			|r_enemigo
+			|r_meta
+			|r_bomba
+			|r_arma
+			|r_bonus
+			|r_bloque;
+
+					
+					
