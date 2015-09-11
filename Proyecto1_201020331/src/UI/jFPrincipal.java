@@ -1,19 +1,19 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package UI;
-
+import Analizadores.*;
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 /**
  *
  * @author Cristian
  */
 public class jFPrincipal extends javax.swing.JFrame {
 
-    /**
-     * Creates new form jFPrincipal
-     */
+    private Lexico analizador_lexico;
+    private Sintactico analizador_sintactico;
+    
     public jFPrincipal() {
         initComponents();
     }
@@ -28,16 +28,16 @@ public class jFPrincipal extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        jTAEntrada = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
-        jMenuItem5 = new javax.swing.JMenuItem();
+        jMISalir = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
-        jMenuItem6 = new javax.swing.JMenuItem();
+        jMICompilar_configuraciones = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
@@ -50,9 +50,9 @@ public class jFPrincipal extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        jTAEntrada.setColumns(20);
+        jTAEntrada.setRows(5);
+        jScrollPane1.setViewportView(jTAEntrada);
 
         jMenu2.setText("Archivo");
 
@@ -71,16 +71,26 @@ public class jFPrincipal extends javax.swing.JFrame {
         jMenuItem4.setText("Guardar Como");
         jMenu2.add(jMenuItem4);
 
-        jMenuItem5.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
-        jMenuItem5.setText("Salir");
-        jMenu2.add(jMenuItem5);
+        jMISalir.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
+        jMISalir.setText("Salir");
+        jMISalir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMISalirActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMISalir);
 
         jMenuBar1.add(jMenu2);
 
         jMenu3.setText("Ejecutar");
 
-        jMenuItem6.setText("Compilar Archivo de Configuración");
-        jMenu3.add(jMenuItem6);
+        jMICompilar_configuraciones.setText("Compilar Archivo de Configuración");
+        jMICompilar_configuraciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMICompilar_configuracionesActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMICompilar_configuraciones);
 
         jMenuItem7.setText("Compilar Archivo de Carga de Escenario");
         jMenu3.add(jMenuItem7);
@@ -146,42 +156,37 @@ public class jFPrincipal extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenuItem13ActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
+    private void jMICompilar_configuracionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICompilar_configuracionesActionPerformed
+        try{
+            String archivo_entrada = jTAEntrada.getText();
+            if(!archivo_entrada.isEmpty()){
+                analizador_lexico = new Lexico(new BufferedReader(new StringReader(archivo_entrada)));
+                analizador_sintactico = new Sintactico(analizador_lexico);
+                analizador_sintactico.parse();
+                if(analizador_sintactico.getEstado() == true){
+                    JOptionPane.showMessageDialog(null,"NO SE HAN ENCONTRADO "
+                            + "ERRORES","EXITO",JOptionPane.WARNING_MESSAGE);
+                }else{
+                    JOptionPane.showMessageDialog(null,"HAY UN ERROR LEXICO O "
+                            + "SINTACTICO\n CONSULTE EL AREA DE ERRORES"
+                            + "","ERROR",JOptionPane.ERROR_MESSAGE);
+                } 
+            }else{
+                JOptionPane.showMessageDialog(null,"NO HAY TEXTO PARA ANALIZAR","Precaución",JOptionPane.WARNING_MESSAGE);
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(jFPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(jFPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(jFPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(jFPrincipal.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                       
+        }catch(Exception ex){
+             Logger.getLogger(jFPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //</editor-fold>
+    }//GEN-LAST:event_jMICompilar_configuracionesActionPerformed
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new jFPrincipal().setVisible(true);
-            }
-        });
-    }
+    private void jMISalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMISalirActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_jMISalirActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem jMICompilar_configuraciones;
+    private javax.swing.JMenuItem jMISalir;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
@@ -195,12 +200,10 @@ public class jFPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
-    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea jTAEntrada;
     // End of variables declaration//GEN-END:variables
 }
