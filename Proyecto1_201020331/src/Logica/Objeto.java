@@ -12,6 +12,7 @@ public class Objeto {
     private int destruir;
     private int vida;
     private String tipo;
+    private String descripcion;
     
     public Objeto(){
         this.nombre = "";
@@ -19,10 +20,11 @@ public class Objeto {
         this.destruir = 0;
         this.vida = 0;
         this.tipo = "";
+        this.descripcion = "";
     }
     
     //METODO CONSTRUCTOR DE LA CLASE
-    public Objeto(String n, String i, int v, String t){
+    public Objeto(String n, String i, int v, String t, String d){
         this.nombre = n;
         this.imagen = i;
         this.tipo = t;
@@ -33,6 +35,7 @@ public class Objeto {
         }else{
             this.destruir = 0;
         }
+        this.descripcion = d;
     }//fin del metodo constructor
     
     //METODOS GETTER Y SETTER DE LA CLASE
@@ -75,6 +78,13 @@ public class Objeto {
     public void setTipo(String tipo) {
         this.tipo = tipo;
     }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
     
-    
-}
+}//FIN DE LA CLASE OBJETO

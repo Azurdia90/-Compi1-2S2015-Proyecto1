@@ -3,14 +3,14 @@ package Analizadores;
 
 import java_cup.runtime.*; 
 import java.util.ArrayList;
-
+import Logica.Objeto;
  
 parser code 
 {: 
 
 //variables utilizadas para el analisis sintactico
 private boolean estado = false;
-
+private Objeto objeto = null;
 
 public boolean getEstado(){
 	return estado;
@@ -64,26 +64,27 @@ FONDO ::=	r_nombre s_igual atributo_nombre s_punto_coma r_imagen s_igual s_comil
 DECLARAR_ATRIBUTOS ::=  llave_abrir ATRIBUTOS llave_cerrar s_coma DECLARAR_ATRIBUTOS
 						|llave_abrir ATRIBUTOS llave_cerrar; 
 
-ATRIBUTOS ::= 	ATRIBUTO_NOMBRE ATRIBUTOS
-				|ATRIBUTO_VIDA ATRIBUTOS
-				|ATRIBUTO_DESTRUIR ATRIBUTOS
-				|ATRIBUTO_IMAGEN ATRIBUTOS
-				|ATRIBUTO_TIPO ATRIBUTOS
-				|ATRIBUTO_DESCRIPCION ATRIBUTOS
-				|ATRIBUTO_NOMBRE
-				|ATRIBUTO_VIDA
-				|ATRIBUTO_DESTRUIR
-				|ATRIBUTO_IMAGEN
-				|ATRIBUTO_TIPO
-				|ATRIBUTO_DESCRIPCION;
+ATRIBUTOS ::= 	ATRIBUTO_NOMBRE:n ATRIBUTOS:a
+				|ATRIBUTO_VIDA:v ATRIBUTOS:a
+				|ATRIBUTO_DESTRUIR:d ATRIBUTOS:a
+				|ATRIBUTO_IMAGEN:i ATRIBUTOS:a
+				|ATRIBUTO_TIPO:t ATRIBUTOS:a
+				|ATRIBUTO_DESCRIPCION:d ATRIBUTOS:a {:a.setDescripcion(d.toString()); RESULT = a;:}
+				|ATRIBUTO_NOMBRE:a      {:objeto = new Objeto(); objeto.setNombre(a.toString()); RESULT = objeto;:}
+				|ATRIBUTO_VIDA:a		{:objeto = new Objeto(); objeto.setVida(Integer.parseInt(a.toString())); RESULT = objeto;:}
+				|ATRIBUTO_DESTRUIR:a	{:objeto = new Objeto(); objeto.setDestruir(Integer.parseInt(a.toString())); RESULT = objeto;:}
+				|ATRIBUTO_IMAGEN:a		{:objeto = new Objeto(); objeto.setImagen(a.toString()); RESULT = objeto;:}
+				|ATRIBUTO_TIPO:a		{:objeto = new Objeto(); objeto.setTipo(a.toString()); RESULT = objeto;:}
+				|ATRIBUTO_DESCRIPCION:a {:objeto = new Objeto(); objeto.setDescripcion(a.toString()); RESULT = objeto;:};
 
 				   	
-ATRIBUTO_NOMBRE ::= r_nombre s_igual atributo_nombre s_punto_coma;
+ATRIBUTO_NOMBRE ::= r_nombre s_igual atributo_nombre:n s_punto_coma{:RESULT = n.toString();:};
 
-ATRIBUTO_DESTRUIR ::= r_destruir s_igual numero s_punto_coma ;
+ATRIBUTO_DESTRUIR ::= r_destruir s_igual numero:n s_punto_coma{:int n_aux = Integer.parseInt(n.toString());
+if(n_aux < 101 && n_aux > 0){ n_aux = n_aux / 10; n_aux = n_aux  *10;} else{n_aux = 100;} RESULT = n_aux;:};
 
 ATRIBUTO_VIDA ::= r_vida s_igual numero:n s_punto_coma{:int n_aux = Integer.parseInt(n.toString());
-if(n_aux < 101 && n_aux > 0){ n_aux = n_aux / 10; n_aux = n_aux  *10;} else{n_aux = 100;}:};
+if(n_aux < 101 && n_aux > 0){ n_aux = n_aux / 10; n_aux = n_aux  *10;} else{n_aux = 100;} RESULT = n_aux;:};
 
 ATRIBUTO_IMAGEN ::= r_imagen s_igual s_comillas path:p s_comillas s_punto_coma {:RESULT = p.toString();:};
 
