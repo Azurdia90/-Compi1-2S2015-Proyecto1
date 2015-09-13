@@ -4,6 +4,7 @@ package Analizadores;
 import java_cup.runtime.*; 
 import java.util.ArrayList;
 import Logica.Objeto;
+import Logica.Arbol_AST;
  
 parser code 
 {: 
@@ -27,8 +28,8 @@ public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
 :} 
 
 terminal abrir_tag, r_configuracion, r_fondo, r_disenio,r_figura, r_nombre, r_vida, r_tipo, r_arma, r_bloque, r_bomba, r_bonus, 
-r_enemigo, r_heroe, r_meta, r_destruir, r_descripcion, cerrar_tag, llave_abrir, s_igual, atributo_nombre, atributo_descripcion,
- s_punto_coma, r_imagen, s_comillas, path, numero, s_coma, llave_cerrar, s_guion;
+r_enemigo, r_heroe, r_meta, r_destruir, r_descripcion, cerrar_tag, llave_abrir, s_igual, atributo_nombre, s_punto_coma, r_imagen, 
+s_comillas, descripcion, numero, s_coma, llave_cerrar, s_guion;
 
 non terminal INICIO, ARCHIVO_CONFIGURACION, CONFIGURACION, CONFIGURACION_FONDO, FONDO, DECLARAR_ATRIBUTOS, ATRIBUTOS, 
 ATRIBUTO_NOMBRE, ATRIBUTO_VIDA, ATRIBUTO_DESTRUIR, ATRIBUTO_IMAGEN, ATRIBUTO_TIPO, ATRIBUTO_DESCRIPCION, TIPO;
@@ -58,17 +59,18 @@ CONFIGURACION ::=	abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_g
 CONFIGURACION_FONDO ::=	llave_abrir FONDO llave_cerrar s_coma CONFIGURACION_FONDO
 						|llave_abrir FONDO llave_cerrar; 
 
-FONDO ::=	r_nombre s_igual atributo_nombre s_punto_coma r_imagen s_igual s_comillas path s_comillas s_punto_coma
-			|r_imagen s_igual s_comillas path s_comillas s_punto_coma r_nombre s_igual atributo_nombre s_punto_coma;
+FONDO ::=	r_nombre s_igual atributo_nombre s_punto_coma r_imagen s_igual descripcion s_punto_coma
+			|r_imagen s_igual descripcion s_punto_coma r_nombre s_igual atributo_nombre s_punto_coma;
 
-DECLARAR_ATRIBUTOS ::=  llave_abrir ATRIBUTOS llave_cerrar s_coma DECLARAR_ATRIBUTOS
-						|llave_abrir ATRIBUTOS llave_cerrar; 
+DECLARAR_ATRIBUTOS ::=  llave_abrir ATRIBUTOS:a llave_cerrar s_coma DECLARAR_ATRIBUTOS
+						{:Arbol_AST.getLista_Objetos().add(a);:}
+						|llave_abrir ATRIBUTOS:a llave_cerrar {:Arbol_AST.getLista_Objetos().add(a);:}; 
 
-ATRIBUTOS ::= 	ATRIBUTO_NOMBRE:n ATRIBUTOS:a
-				|ATRIBUTO_VIDA:v ATRIBUTOS:a
-				|ATRIBUTO_DESTRUIR:d ATRIBUTOS:a
-				|ATRIBUTO_IMAGEN:i ATRIBUTOS:a
-				|ATRIBUTO_TIPO:t ATRIBUTOS:a
+ATRIBUTOS ::= 	ATRIBUTO_NOMBRE:n ATRIBUTOS:a 		{:a.setNombre(n.toString()); RESULT = a;:}
+				|ATRIBUTO_VIDA:v ATRIBUTOS:a 		{:a.setVida(Integer.parseInt(v.toString())); RESULT = a;:}
+				|ATRIBUTO_DESTRUIR:d ATRIBUTOS:a 	{:a.setDestruir(Integer.parseInt(d.toString())); RESULT = a;:}
+				|ATRIBUTO_IMAGEN:i ATRIBUTOS:a 		{:a.setImagen(i.toString()); RESULT = a;:}
+				|ATRIBUTO_TIPO:t ATRIBUTOS:a 		{:a.setTipo(t.toString()); RESULT = a;:}
 				|ATRIBUTO_DESCRIPCION:d ATRIBUTOS:a {:a.setDescripcion(d.toString()); RESULT = a;:}
 				|ATRIBUTO_NOMBRE:a      {:objeto = new Objeto(); objeto.setNombre(a.toString()); RESULT = objeto;:}
 				|ATRIBUTO_VIDA:a		{:objeto = new Objeto(); objeto.setVida(Integer.parseInt(a.toString())); RESULT = objeto;:}
@@ -86,11 +88,11 @@ if(n_aux < 101 && n_aux > 0){ n_aux = n_aux / 10; n_aux = n_aux  *10;} else{n_au
 ATRIBUTO_VIDA ::= r_vida s_igual numero:n s_punto_coma{:int n_aux = Integer.parseInt(n.toString());
 if(n_aux < 101 && n_aux > 0){ n_aux = n_aux / 10; n_aux = n_aux  *10;} else{n_aux = 100;} RESULT = n_aux;:};
 
-ATRIBUTO_IMAGEN ::= r_imagen s_igual s_comillas path:p s_comillas s_punto_coma {:RESULT = p.toString();:};
+ATRIBUTO_IMAGEN ::= r_imagen s_igual descripcion:p s_punto_coma {:RESULT = p.toString();:};
 
 ATRIBUTO_TIPO  ::= r_tipo s_igual TIPO:t s_punto_coma {:RESULT = t.toString();:};
 
-ATRIBUTO_DESCRIPCION ::= r_descripcion s_igual s_comillas atributo_nombre s_comillas s_punto_coma;
+ATRIBUTO_DESCRIPCION ::= r_descripcion s_igual descripcion:d s_punto_coma;
 
 TIPO ::= 	r_heroe:r   {:RESULT = r;:}
 			|r_enemigo:r {:RESULT = r;:}
