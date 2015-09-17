@@ -44,6 +44,7 @@ descripcion = "\"" [^\"] ~"\""
 "enemigo"			{return new Symbol(Tabla_simbolos.r_enemigo, yycolumn,yyline,new String(yytext()));}
 "heroe"				{return new Symbol(Tabla_simbolos.r_heroe, yycolumn,yyline,new String(yytext()));}
 "destruir"			{return new Symbol(Tabla_simbolos.r_destruir, yycolumn,yyline,new String(yytext()));}
+"creditos"			{return new Symbol(Tabla_simbolos.r_creditos, yycolumn,yyline,new String(yytext()));}
 "descripcion"		{return new Symbol(Tabla_simbolos.r_descripcion, yycolumn,yyline,new String(yytext()));}
 "dise\u00f1o"		{return new Symbol(Tabla_simbolos.r_disenio, yycolumn,yyline,new String(yytext()));}
 "arma"				{return new Symbol(Tabla_simbolos.r_arma, yycolumn,yyline,new String(yytext()));}

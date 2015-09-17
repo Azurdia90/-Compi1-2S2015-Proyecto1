@@ -1,6 +1,7 @@
 package Logica;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -8,15 +9,14 @@ import java.util.ArrayList;
  */
 public class Arbol_AST {
     
-    private static ArrayList<Objeto> lista_objetos;
+    private static Map <String,Objeto> Tabla_objetos = new HashMap<String, Objeto>();
 
-    public static ArrayList<Objeto> getLista_objetos() {
-        return lista_objetos;
+    public static Map<String, Objeto> getTabla_objetos() {
+        return Tabla_objetos;
     }
 
-    public static void setLista_objetos(ArrayList<Objeto> lista_objetos) {
-        Arbol_AST.lista_objetos = lista_objetos;
+    public static void setTabla_objetos(Map<String, Objeto> Tabla_objetos) {
+        Arbol_AST.Tabla_objetos = Tabla_objetos;
     }
-    
-    
-}
+
+}//FIN DE LA CLASE ARBOL_AST

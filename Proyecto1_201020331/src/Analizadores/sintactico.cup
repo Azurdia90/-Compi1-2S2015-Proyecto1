@@ -1,10 +1,11 @@
 package Analizadores; 
 
-
-import java_cup.runtime.*; 
-import java.util.ArrayList;
+import java.io.File;
 import Logica.Objeto;
 import Logica.Arbol_AST;
+import java_cup.runtime.*; 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
  
 parser code 
 {: 
@@ -17,6 +18,38 @@ public boolean getEstado(){
 	return estado;
 }
 
+private int verificar_numero(int n_aux){
+	if(n_aux < 101 && n_aux > 0){ 
+	n_aux = n_aux / 10; n_aux = n_aux  *10;
+	} else{
+	n_aux = 100;
+	}
+	return n_aux;
+}//fin del metodo para verificar numeros
+
+private boolean verificar_path(String descripcion){
+	boolean aceptado = false;
+	//se eliminan las comillas que se tienen al inicio y al final de la cadena
+	String path = descripcion.substring(1,descripcion.length()-1);
+	//Utilizando Regex se verifica que sea un path y no una descripcion
+	Pattern patron = Pattern.compile("^(?:[\\w]\\:|\\\\)(\\\\[a-z_\\-\\s0-9\\.]+)+\\.(conf|gif|jpg|bmp|raw|png|jpeg)$");
+	Matcher analizador = patron.matcher(path);
+	if(analizador.find()){
+		File imagen  = new File(path);
+		if(imagen.exists()){
+			//se guarda la imagen
+			aceptado = true;
+		}else{
+			//el path no existe pero si es un path
+			aceptado = false;
+		}
+	}else{
+		aceptado = false;
+		//es una descripcion y no imagen
+	}
+	return aceptado;
+}//fin del metodo para separar imagenes de descripciones
+
 /**Metodo al que se llama automáticamente ante algún error sintactico.*/ 
 public void syntax_error(Symbol s){ 
  System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
@@ -27,12 +60,12 @@ public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
 } 
 :} 
 
-terminal abrir_tag, r_configuracion, r_fondo, r_disenio,r_figura, r_nombre, r_vida, r_tipo, r_arma, r_bloque, r_bomba, r_bonus, 
-r_enemigo, r_heroe, r_meta, r_destruir, r_descripcion, cerrar_tag, llave_abrir, s_igual, atributo_nombre, s_punto_coma, r_imagen, 
-s_comillas, descripcion, numero, s_coma, llave_cerrar, s_guion;
+terminal abrir_tag, r_configuracion, r_fondo, r_disenio,r_figura, r_nombre, r_creditos, r_vida, r_tipo, r_arma, r_bloque, r_bomba, 
+r_bonus, r_enemigo, r_heroe, r_meta, r_destruir, r_descripcion, cerrar_tag, llave_abrir, s_igual, atributo_nombre, s_punto_coma, 
+r_imagen, s_comillas, descripcion, numero, s_coma, llave_cerrar, s_guion;
 
 non terminal INICIO, ARCHIVO_CONFIGURACION, CONFIGURACION, CONFIGURACION_FONDO, FONDO, DECLARAR_ATRIBUTOS, ATRIBUTOS, 
-ATRIBUTO_NOMBRE, ATRIBUTO_VIDA, ATRIBUTO_DESTRUIR, ATRIBUTO_IMAGEN, ATRIBUTO_TIPO, ATRIBUTO_DESCRIPCION, TIPO;
+ATRIBUTO_NOMBRE, ATRIBUTO_VIDA, ATRIBUTO_DESTRUIR, ATRIBUTO_CREDITOS, ATRIBUTO_IMAGEN, ATRIBUTO_TIPO, ATRIBUTO_DESCRIPCION, TIPO;
   
 start with INICIO;  
 
@@ -56,25 +89,41 @@ CONFIGURACION ::=	abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_g
 				   	abrir_tag r_figura cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_figura cerrar_tag
 				   	abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag;
 
-CONFIGURACION_FONDO ::=	llave_abrir FONDO llave_cerrar s_coma CONFIGURACION_FONDO
-						|llave_abrir FONDO llave_cerrar; 
+CONFIGURACION_FONDO ::=	llave_abrir FONDO:f llave_cerrar s_coma CONFIGURACION_FONDO
+						{:Arbol_AST.getTabla_objetos().put(f.getNombre(), f);:}
+						|llave_abrir FONDO:f llave_cerrar
+						{:Arbol_AST.getTabla_objetos().put(f.getNombre(), f);:}; 
 
-FONDO ::=	r_nombre s_igual atributo_nombre s_punto_coma r_imagen s_igual descripcion s_punto_coma
-			|r_imagen s_igual descripcion s_punto_coma r_nombre s_igual atributo_nombre s_punto_coma;
-
+FONDO ::=	r_nombre s_igual atributo_nombre:n s_punto_coma r_imagen:i s_igual descripcion s_punto_coma
+			{:if(verificar_path(i.toString())==true){
+				objeto = new Objeto(n.toString(),i.toString(),0,0,"fondo","");
+			  }else{
+			  	objeto = new Objeto(n.toString(),"",0,0,"fondo","");
+			  }
+			:}
+			|r_imagen s_igual descripcion:i s_punto_coma r_nombre s_igual atributo_nombre:n s_punto_coma
+						{:if(verificar_path(i.toString())==true){
+				objeto = new Objeto(n.toString(),i.toString(),0,0,"fondo","");
+			  }else{
+			  	objeto = new Objeto(n.toString(),"",0,0,"fondo","");
+			  }
+			:};
+			
 DECLARAR_ATRIBUTOS ::=  llave_abrir ATRIBUTOS:a llave_cerrar s_coma DECLARAR_ATRIBUTOS
-						{:Arbol_AST.getLista_Objetos().add(a);:}
-						|llave_abrir ATRIBUTOS:a llave_cerrar {:Arbol_AST.getLista_Objetos().add(a);:}; 
+						{:Arbol_AST.getTabla_objetos().put(a.getNombre(), a);:}
+						|llave_abrir ATRIBUTOS:a llave_cerrar {:Arbol_AST.getTabla_objetos().put(a.getNombre(), a);:}; 
 
 ATRIBUTOS ::= 	ATRIBUTO_NOMBRE:n ATRIBUTOS:a 		{:a.setNombre(n.toString()); RESULT = a;:}
 				|ATRIBUTO_VIDA:v ATRIBUTOS:a 		{:a.setVida(Integer.parseInt(v.toString())); RESULT = a;:}
 				|ATRIBUTO_DESTRUIR:d ATRIBUTOS:a 	{:a.setDestruir(Integer.parseInt(d.toString())); RESULT = a;:}
+				|ATRIBUTO_CREDITOS:d ATRIBUTOS:a 	{:a.setCreditos(Integer.parseInt(d.toString())); RESULT = a;:}
 				|ATRIBUTO_IMAGEN:i ATRIBUTOS:a 		{:a.setImagen(i.toString()); RESULT = a;:}
 				|ATRIBUTO_TIPO:t ATRIBUTOS:a 		{:a.setTipo(t.toString()); RESULT = a;:}
 				|ATRIBUTO_DESCRIPCION:d ATRIBUTOS:a {:a.setDescripcion(d.toString()); RESULT = a;:}
 				|ATRIBUTO_NOMBRE:a      {:objeto = new Objeto(); objeto.setNombre(a.toString()); RESULT = objeto;:}
 				|ATRIBUTO_VIDA:a		{:objeto = new Objeto(); objeto.setVida(Integer.parseInt(a.toString())); RESULT = objeto;:}
 				|ATRIBUTO_DESTRUIR:a	{:objeto = new Objeto(); objeto.setDestruir(Integer.parseInt(a.toString())); RESULT = objeto;:}
+				|ATRIBUTO_CREDITOS:a	{:objeto = new Objeto(); objeto.setCreditos(Integer.parseInt(a.toString())); RESULT = objeto;:}
 				|ATRIBUTO_IMAGEN:a		{:objeto = new Objeto(); objeto.setImagen(a.toString()); RESULT = objeto;:}
 				|ATRIBUTO_TIPO:a		{:objeto = new Objeto(); objeto.setTipo(a.toString()); RESULT = objeto;:}
 				|ATRIBUTO_DESCRIPCION:a {:objeto = new Objeto(); objeto.setDescripcion(a.toString()); RESULT = objeto;:};
@@ -82,19 +131,38 @@ ATRIBUTOS ::= 	ATRIBUTO_NOMBRE:n ATRIBUTOS:a 		{:a.setNombre(n.toString()); RESU
 				   	
 ATRIBUTO_NOMBRE ::= r_nombre s_igual atributo_nombre:n s_punto_coma{:RESULT = n.toString();:};
 
-ATRIBUTO_DESTRUIR ::= r_destruir s_igual numero:n s_punto_coma{:int n_aux = Integer.parseInt(n.toString());
-if(n_aux < 101 && n_aux > 0){ n_aux = n_aux / 10; n_aux = n_aux  *10;} else{n_aux = 100;} RESULT = n_aux;:};
+ATRIBUTO_DESTRUIR ::= r_destruir s_igual numero:n s_punto_coma
+						{:
+						int n_aux = Integer.parseInt(n.toString());
+						RESULT = parser.verificar_numero(n_aux);
+						:};
 
-ATRIBUTO_VIDA ::= r_vida s_igual numero:n s_punto_coma{:int n_aux = Integer.parseInt(n.toString());
-if(n_aux < 101 && n_aux > 0){ n_aux = n_aux / 10; n_aux = n_aux  *10;} else{n_aux = 100;} RESULT = n_aux;:};
+ATRIBUTO_VIDA ::= r_vida s_igual numero:n s_punto_coma
+					{:
+					int n_aux = Integer.parseInt(n.toString());
+					RESULT = parser.verificar_numero(n_aux);
+					:};
 
-ATRIBUTO_IMAGEN ::= r_imagen s_igual descripcion:p s_punto_coma {:RESULT = p.toString();:};
+ATRIBUTO_CREDITOS ::= r_creditos s_igual numero:n s_punto_coma
+						{:
+						int n_aux = Integer.parseInt(n.toString());
+						RESULT = parser.verificar_numero(n_aux);
+						:};
 
+ATRIBUTO_IMAGEN ::= r_imagen s_igual descripcion:p s_punto_coma 
+					{:
+					if(verificar_path(p.toString())== true){
+						RESULT = p.toString();
+					}else{
+						RESULT = "";
+					}
+					:};
+ 		
 ATRIBUTO_TIPO  ::= r_tipo s_igual TIPO:t s_punto_coma {:RESULT = t.toString();:};
 
-ATRIBUTO_DESCRIPCION ::= r_descripcion s_igual descripcion:d s_punto_coma;
+ATRIBUTO_DESCRIPCION ::= r_descripcion s_igual descripcion:d s_punto_coma{:RESULT = d.toString();:};
 
-TIPO ::= 	r_heroe:r   {:RESULT = r;:}
+TIPO ::= 	r_heroe:r    {:RESULT = r;:}
 			|r_enemigo:r {:RESULT = r;:}
 			|r_meta:r   {:RESULT = r;:}
 			|r_bomba:r  {:RESULT = r;:}

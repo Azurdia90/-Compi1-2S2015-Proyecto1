@@ -10,6 +10,7 @@ public class Objeto {
     private String nombre;
     private String imagen;
     private int destruir;
+    private int creditos;
     private int vida;
     private String tipo;
     private String descripcion;
@@ -19,23 +20,47 @@ public class Objeto {
         this.imagen = "";
         this.destruir = 0;
         this.vida = 0;
+        this.creditos = 0;
         this.tipo = "";
         this.descripcion = "";
     }
     
     //METODO CONSTRUCTOR DE LA CLASE
-    public Objeto(String n, String i, int v, String t, String d){
+    public Objeto(String n, String i, int v, int ds, String t, String d){
         this.nombre = n;
         this.imagen = i;
         this.tipo = t;
-        if(this.tipo.equals("bonus") || this.tipo.equals("heroe")|| this.tipo.equals("enemigo")){
+        if(this.tipo.equals("heroe")){
             this.vida = v;
-        }else if(this.tipo.equals("arma")|| this.tipo.equals("bomba")){
-            this.destruir = v;
-        }else{
             this.destruir = 0;
+            this.creditos = 0;
+            this.descripcion = d;
+        }else if(this.tipo.equals("enemigo")){
+            this.vida = v;
+            this.destruir = ds;
+            this.creditos = 0;
+            this.descripcion = d;
+        }else if(this.tipo.equals("fondo")){
+            this.vida = 0;
+            this.destruir = 0;
+            this.creditos = 0;
+            this.descripcion = "";      
+        }else if(this.tipo.equals("bomba")|| this.tipo.equals("arma")){
+            this.vida = 0;
+            this.destruir = ds;
+            this.creditos = 0;
+            this.descripcion = "";
+        }else if(this.tipo.equals("bloque")||this.tipo.equals("meta")){
+            this.vida = 0;
+            this.destruir = 0;
+            this.creditos = 0;
+            this. descripcion = "";
+        }else if(this.tipo.equals("bonus")){
+            this.vida = 0;
+            this.destruir = 0;
+            this.creditos = v;
+            this.descripcion ="";
         }
-        this.descripcion = d;
     }//fin del metodo constructor
     
     //METODOS GETTER Y SETTER DE LA CLASE
@@ -63,6 +88,14 @@ public class Objeto {
         this.destruir = destruir;
     }
 
+    public int getCreditos() {
+        return creditos;
+    }
+
+    public void setCreditos(int creditos) {
+        this.creditos = creditos;
+    }
+
     public int getVida() {
         return vida;
     }
@@ -86,5 +119,5 @@ public class Objeto {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
-    
+  
 }//FIN DE LA CLASE OBJETO
