@@ -13,9 +13,9 @@ public class Tabla_simbolos {
   public static final int r_bloque = 12;
   public static final int r_meta = 17;
   public static final int r_arma = 11;
-  public static final int s_guion = 31;
-  public static final int descripcion = 27;
-  public static final int numero = 28;
+  public static final int s_guion = 30;
+  public static final int descripcion = 26;
+  public static final int numero = 27;
   public static final int s_igual = 22;
   public static final int r_vida = 9;
   public static final int r_configuracion = 3;
@@ -26,8 +26,7 @@ public class Tabla_simbolos {
   public static final int r_disenio = 5;
   public static final int r_destruir = 18;
   public static final int s_punto_coma = 24;
-  public static final int s_comillas = 26;
-  public static final int llave_cerrar = 30;
+  public static final int llave_cerrar = 29;
   public static final int r_enemigo = 15;
   public static final int abrir_tag = 2;
   public static final int EOF = 0;
@@ -37,7 +36,7 @@ public class Tabla_simbolos {
   public static final int r_tipo = 10;
   public static final int r_figura = 6;
   public static final int r_nombre = 7;
-  public static final int s_coma = 29;
+  public static final int s_coma = 28;
   public static final int r_bonus = 14;
   public static final int cerrar_tag = 20;
   public static final String[] terminalNames = new String[] {
@@ -67,7 +66,6 @@ public class Tabla_simbolos {
   "atributo_nombre",
   "s_punto_coma",
   "r_imagen",
-  "s_comillas",
   "descripcion",
   "numero",
   "s_coma",

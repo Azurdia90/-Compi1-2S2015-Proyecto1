@@ -6,12 +6,13 @@ import Logica.Arbol_AST;
 import java_cup.runtime.*; 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
  
 parser code 
 {: 
 
 //variables utilizadas para el analisis sintactico
-private boolean estado = false;
+private boolean estado = true;
 private Objeto objeto = null;
 
 public boolean getEstado(){
@@ -41,10 +42,11 @@ private boolean verificar_path(String descripcion){
 			aceptado = true;
 		}else{
 			//el path no existe pero si es un path
-			aceptado = false;
+			aceptado = true;
 		}
 	}else{
 		aceptado = false;
+		estado = false;
 		//es una descripcion y no imagen
 	}
 	return aceptado;
@@ -62,14 +64,24 @@ public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
 
 terminal abrir_tag, r_configuracion, r_fondo, r_disenio,r_figura, r_nombre, r_creditos, r_vida, r_tipo, r_arma, r_bloque, r_bomba, 
 r_bonus, r_enemigo, r_heroe, r_meta, r_destruir, r_descripcion, cerrar_tag, llave_abrir, s_igual, atributo_nombre, s_punto_coma, 
-r_imagen, s_comillas, descripcion, numero, s_coma, llave_cerrar, s_guion;
+r_imagen, descripcion, numero, s_coma, llave_cerrar, s_guion;
 
 non terminal INICIO, ARCHIVO_CONFIGURACION, CONFIGURACION, CONFIGURACION_FONDO, FONDO, DECLARAR_ATRIBUTOS, ATRIBUTOS, 
 ATRIBUTO_NOMBRE, ATRIBUTO_VIDA, ATRIBUTO_DESTRUIR, ATRIBUTO_CREDITOS, ATRIBUTO_IMAGEN, ATRIBUTO_TIPO, ATRIBUTO_DESCRIPCION, TIPO;
   
 start with INICIO;  
 
-INICIO ::=  ARCHIVO_CONFIGURACION{:parser.estado = true;:};
+INICIO ::=  ARCHIVO_CONFIGURACION
+			{:
+			if(parser.estado == true){
+                JOptionPane.showMessageDialog(null,"NO SE HAN ENCONTRADO "
+                + "ERRORES","EXITO",JOptionPane.WARNING_MESSAGE);	
+			}else{
+     			JOptionPane.showMessageDialog(null,"HAY UN ERROR LEXICO O "
+                + "SINTACTICO\n CONSULTE EL AREA DE ERRORES"
+                + "","ERROR",JOptionPane.ERROR_MESSAGE);
+			} 
+			:};
 
 ARCHIVO_CONFIGURACION ::= abrir_tag r_configuracion cerrar_tag CONFIGURACION abrir_tag s_guion r_configuracion cerrar_tag;
 			
@@ -94,19 +106,25 @@ CONFIGURACION_FONDO ::=	llave_abrir FONDO:f llave_cerrar s_coma CONFIGURACION_FO
 						|llave_abrir FONDO:f llave_cerrar
 						{:Arbol_AST.getTabla_objetos().put(f.getNombre(), f);:}; 
 
-FONDO ::=	r_nombre s_igual atributo_nombre:n s_punto_coma r_imagen:i s_igual descripcion s_punto_coma
-			{:if(verificar_path(i.toString())==true){
+FONDO ::=	r_nombre s_igual atributo_nombre:n s_punto_coma r_imagen s_igual descripcion:i s_punto_coma
+			{:
+			if(verificar_path(i.toString())==true){
 				objeto = new Objeto(n.toString(),i.toString(),0,0,"fondo","");
-			  }else{
+				RESULT = objeto;
+			}else{
 			  	objeto = new Objeto(n.toString(),"",0,0,"fondo","");
-			  }
+			  	RESULT = objeto;
+			}
 			:}
 			|r_imagen s_igual descripcion:i s_punto_coma r_nombre s_igual atributo_nombre:n s_punto_coma
-						{:if(verificar_path(i.toString())==true){
+			{:
+			if(verificar_path(i.toString())==true){
 				objeto = new Objeto(n.toString(),i.toString(),0,0,"fondo","");
-			  }else{
+				RESULT = objeto;
+			}else{
 			  	objeto = new Objeto(n.toString(),"",0,0,"fondo","");
-			  }
+			  	RESULT = objeto;
+			}
 			:};
 			
 DECLARAR_ATRIBUTOS ::=  llave_abrir ATRIBUTOS:a llave_cerrar s_coma DECLARAR_ATRIBUTOS

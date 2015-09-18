@@ -20,7 +20,7 @@ numero = [0-9]+
 letra = [a-zñA-ZÑ]
 guion = [/\\]
 atributo_nombre = {letra}({letra}|{numero}|"_")*
-descripcion = "\"" [^\"] ~"\""
+descripcion = "\""[^\"] ~"\""
 
 
 %{
@@ -58,7 +58,6 @@ descripcion = "\"" [^\"] ~"\""
 {atributo_nombre}   {return new Symbol(Tabla_simbolos.atributo_nombre, yycolumn,yyline,new String(yytext()));}
 ";"					{return new Symbol(Tabla_simbolos.s_punto_coma, yycolumn,yyline,new String(yytext()));}
 "imagen"			{return new Symbol(Tabla_simbolos.r_imagen, yycolumn,yyline,new String(yytext()));}
-"\""				{return new Symbol(Tabla_simbolos.s_comillas, yycolumn,yyline,new String(yytext()));}
 {descripcion}		{return new Symbol(Tabla_simbolos.descripcion, yycolumn,yyline,new String(yytext()));}
 {numero}			{return new Symbol(Tabla_simbolos.numero, yycolumn,yyline,new String(yytext()));}
 ","					{return new Symbol(Tabla_simbolos.s_coma, yycolumn,yyline,new String(yytext()));}

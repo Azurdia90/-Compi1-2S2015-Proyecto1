@@ -163,14 +163,6 @@ public class jFPrincipal extends javax.swing.JFrame {
                 analizador_lexico = new Lexico(new BufferedReader(new StringReader(archivo_entrada)));
                 analizador_sintactico = new Sintactico(analizador_lexico);
                 analizador_sintactico.parse();
-                if(analizador_sintactico.getEstado() == true){
-                    JOptionPane.showMessageDialog(null,"NO SE HAN ENCONTRADO "
-                            + "ERRORES","EXITO",JOptionPane.WARNING_MESSAGE);
-                }else{
-                    JOptionPane.showMessageDialog(null,"HAY UN ERROR LEXICO O "
-                            + "SINTACTICO\n CONSULTE EL AREA DE ERRORES"
-                            + "","ERROR",JOptionPane.ERROR_MESSAGE);
-                } 
             }else{
                 JOptionPane.showMessageDialog(null,"NO HAY TEXTO PARA ANALIZAR","Precaución",JOptionPane.WARNING_MESSAGE);
             }
