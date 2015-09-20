@@ -2,6 +2,8 @@
 
 package Analizadores;
 
+import Logica.Arbol_AST;
+import Logica.Error_encontrado;
 import	java_cup.runtime.Symbol;  
 
 
@@ -446,6 +448,10 @@ public class Lexico implements java_cup.runtime.Scanner {
 
   /* user code: */
 //codigo que se utilizara en el analizador lexico
+private void listar_error(String t, int y, int x){
+	Error_encontrado error_lexico = new Error_encontrado(t,"caracter no definido en el lenguaje", x, y, false);
+	Arbol_AST.getLista_errores().add(error_lexico);
+}
 
 
 
@@ -835,8 +841,8 @@ public class Lexico implements java_cup.runtime.Scanner {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1: 
-            { //listar_error(new String(yytext()),yyline,yycolumn);
-				return new Symbol(Tabla_simbolos.error, yycolumn,yyline,new String(yytext()));
+            { listar_error(new String(yytext()),yyline,yycolumn);
+				/*return new Symbol(Tabla_simbolos.error, yycolumn,yyline,new String(yytext()));*/
             }
           case 32: break;
           case 2: 

@@ -36,12 +36,12 @@ public class jFPrincipal extends javax.swing.JFrame {
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMISalir = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
+        jMTabla_simbolos = new javax.swing.JMenu();
         jMICompilar_configuraciones = new javax.swing.JMenuItem();
         jMenuItem7 = new javax.swing.JMenuItem();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
-        jMenuItem10 = new javax.swing.JMenuItem();
+        jMIErrores = new javax.swing.JMenuItem();
         jMenuItem11 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem12 = new javax.swing.JMenuItem();
@@ -82,7 +82,7 @@ public class jFPrincipal extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
-        jMenu3.setText("Ejecutar");
+        jMTabla_simbolos.setText("Ejecutar");
 
         jMICompilar_configuraciones.setText("Compilar Archivo de Configuración");
         jMICompilar_configuraciones.addActionListener(new java.awt.event.ActionListener() {
@@ -90,13 +90,13 @@ public class jFPrincipal extends javax.swing.JFrame {
                 jMICompilar_configuracionesActionPerformed(evt);
             }
         });
-        jMenu3.add(jMICompilar_configuraciones);
+        jMTabla_simbolos.add(jMICompilar_configuraciones);
 
         jMenuItem7.setText("Compilar Archivo de Carga de Escenario");
-        jMenu3.add(jMenuItem7);
+        jMTabla_simbolos.add(jMenuItem7);
 
         jMenuItem8.setText("Compilar Archivo de secuencia de Escenarios");
-        jMenu3.add(jMenuItem8);
+        jMTabla_simbolos.add(jMenuItem8);
 
         jMenuItem9.setText("Ejecutar juego");
         jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
@@ -104,15 +104,25 @@ public class jFPrincipal extends javax.swing.JFrame {
                 jMenuItem9ActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem9);
+        jMTabla_simbolos.add(jMenuItem9);
 
-        jMenuItem10.setText("Errores");
-        jMenu3.add(jMenuItem10);
+        jMIErrores.setText("Errores");
+        jMIErrores.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIErroresActionPerformed(evt);
+            }
+        });
+        jMTabla_simbolos.add(jMIErrores);
 
         jMenuItem11.setText("Tabla de Simbolos");
-        jMenu3.add(jMenuItem11);
+        jMenuItem11.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem11ActionPerformed(evt);
+            }
+        });
+        jMTabla_simbolos.add(jMenuItem11);
 
-        jMenuBar1.add(jMenu3);
+        jMenuBar1.add(jMTabla_simbolos);
 
         jMenu4.setText("Ayuda");
 
@@ -176,15 +186,25 @@ public class jFPrincipal extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_jMISalirActionPerformed
 
+    private void jMenuItem11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem11ActionPerformed
+        jFTabla_simbolos ventana_tabla_simbolos = new jFTabla_simbolos();
+        ventana_tabla_simbolos.show();
+    }//GEN-LAST:event_jMenuItem11ActionPerformed
+
+    private void jMIErroresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIErroresActionPerformed
+        jFTabla_errores ventana_tabla_errores = new jFTabla_errores();
+        ventana_tabla_errores.show();
+    }//GEN-LAST:event_jMIErroresActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem jMICompilar_configuraciones;
+    private javax.swing.JMenuItem jMIErrores;
     private javax.swing.JMenuItem jMISalir;
+    private javax.swing.JMenu jMTabla_simbolos;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem10;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem13;

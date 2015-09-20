@@ -31,9 +31,13 @@ private int verificar_numero(int n_aux){
 private boolean verificar_path(String descripcion){
 	boolean aceptado = false;
 	//se eliminan las comillas que se tienen al inicio y al final de la cadena
+        String path_aux = "";
 	String path = descripcion.substring(1,descripcion.length()-1);
+        if(path.indexOf("/") > -1 ){
+            path_aux = path.replaceAll("/","\\");
+        }
 	//Utilizando Regex se verifica que sea un path y no una descripcion
-	Pattern patron = Pattern.compile("^(?:[\\w]\\:|\\\\)(\\\\[a-z_\\-\\s0-9\\.]+)+\\.(conf|gif|jpg|bmp|raw|png|jpeg)$");
+	Pattern patron = Pattern.compile("^(?:[\\w]\\:|\\\\)(\\\\[a-z_\\-\\s0-9\\.]+)+\\.(jpg|gif|bmp|raw|jpeg|png|tif)$");
 	Matcher analizador = patron.matcher(path);
 	if(analizador.find()){
 		File imagen  = new File(path);
@@ -54,11 +58,14 @@ private boolean verificar_path(String descripcion){
 
 /**Metodo al que se llama automáticamente ante algún error sintactico.*/ 
 public void syntax_error(Symbol s){ 
- System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
+ //System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
+ Error_encontrado error_sintactico = new Error_encontrado(s.value.toString(), "", s.left, s.right+1, true);
+ Arbol_AST.getLista_errores().add(error_sintactico);
 } 
  /**Metodo al que se llama en el momento en que ya no es posible una recuperación de errores.*/ 
 public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
- System.out.println("Error en la Línea " + (s.right+1)+ "Columna "+s.left+". Identificador " + s.value + " no reconocido."); 
+ Error_encontrado error_sintactico = new Error_encontrado(s.value.toString(),"", s.left, s.right+1, true); 
+ Arbol_AST.getLista_errores().add(error_sintactico);
 } 
 :} 
 
@@ -77,13 +84,14 @@ INICIO ::=  ARCHIVO_CONFIGURACION
                 JOptionPane.showMessageDialog(null,"NO SE HAN ENCONTRADO "
                 + "ERRORES","EXITO",JOptionPane.WARNING_MESSAGE);	
 			}else{
-     			JOptionPane.showMessageDialog(null,"HAY UN ERROR LEXICO O "
-                + "SINTACTICO\n CONSULTE EL AREA DE ERRORES"
+     			JOptionPane.showMessageDialog(null,"EXISTEN ERRORES LEXICOS O "
+                + "SINTACTICOS\n CONSULTE EL AREA DE ERRORES"
                 + "","ERROR",JOptionPane.ERROR_MESSAGE);
 			} 
 			:};
 
-ARCHIVO_CONFIGURACION ::= abrir_tag r_configuracion cerrar_tag CONFIGURACION abrir_tag s_guion r_configuracion cerrar_tag;
+ARCHIVO_CONFIGURACION ::= abrir_tag r_configuracion cerrar_tag CONFIGURACION abrir_tag s_guion r_configuracion cerrar_tag
+							|error{:parser.estado = false;:};
 			
 CONFIGURACION ::=	abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
 					abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag
@@ -99,12 +107,14 @@ CONFIGURACION ::=	abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_g
 				   	abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
 				   	|abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
 				   	abrir_tag r_figura cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_figura cerrar_tag
-				   	abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag;
+				   	abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag
+				   	|error;
 
 CONFIGURACION_FONDO ::=	llave_abrir FONDO:f llave_cerrar s_coma CONFIGURACION_FONDO
 						{:Arbol_AST.getTabla_objetos().put(f.getNombre(), f);:}
 						|llave_abrir FONDO:f llave_cerrar
-						{:Arbol_AST.getTabla_objetos().put(f.getNombre(), f);:}; 
+						{:Arbol_AST.getTabla_objetos().put(f.getNombre(), f);:}
+						|error{:parser.estado = false;:}; 
 
 FONDO ::=	r_nombre s_igual atributo_nombre:n s_punto_coma r_imagen s_igual descripcion:i s_punto_coma
 			{:
@@ -129,7 +139,8 @@ FONDO ::=	r_nombre s_igual atributo_nombre:n s_punto_coma r_imagen s_igual descr
 			
 DECLARAR_ATRIBUTOS ::=  llave_abrir ATRIBUTOS:a llave_cerrar s_coma DECLARAR_ATRIBUTOS
 						{:Arbol_AST.getTabla_objetos().put(a.getNombre(), a);:}
-						|llave_abrir ATRIBUTOS:a llave_cerrar {:Arbol_AST.getTabla_objetos().put(a.getNombre(), a);:}; 
+						|llave_abrir ATRIBUTOS:a llave_cerrar {:Arbol_AST.getTabla_objetos().put(a.getNombre(), a);:}
+						|error{:parser.estado = false;:}; 
 
 ATRIBUTOS ::= 	ATRIBUTO_NOMBRE:n ATRIBUTOS:a 		{:a.setNombre(n.toString()); RESULT = a;:}
 				|ATRIBUTO_VIDA:v ATRIBUTOS:a 		{:a.setVida(Integer.parseInt(v.toString())); RESULT = a;:}
@@ -176,7 +187,8 @@ ATRIBUTO_IMAGEN ::= r_imagen s_igual descripcion:p s_punto_coma
 					}
 					:};
  		
-ATRIBUTO_TIPO  ::= r_tipo s_igual TIPO:t s_punto_coma {:RESULT = t.toString();:};
+ATRIBUTO_TIPO  ::= r_tipo s_igual TIPO:t s_punto_coma {:RESULT = t.toString();:}
+					|error{:parser.estado = false;:};
 
 ATRIBUTO_DESCRIPCION ::= r_descripcion s_igual descripcion:d s_punto_coma{:RESULT = d.toString();:};
 

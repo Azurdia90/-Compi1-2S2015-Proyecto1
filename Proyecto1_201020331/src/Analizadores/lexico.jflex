@@ -1,9 +1,9 @@
 package Analizadores;
 
+import Logica.Arbol_AST;
+import Logica.Error_encontrado;
 import	java_cup.runtime.Symbol;  
-
-
-
+ 
 %%
 
 %cupsym Tabla_simbolos  
@@ -25,6 +25,10 @@ descripcion = "\""[^\"] ~"\""
 
 %{
 //codigo que se utilizara en el analizador lexico
+private void listar_error(String t, int y, int x){
+	Error_encontrado error_lexico = new Error_encontrado(t,"caracter no definido en el lenguaje", x, y, false);
+	Arbol_AST.getLista_errores().add(error_lexico);
+}
 
 %}
 
@@ -68,5 +72,5 @@ descripcion = "\""[^\"] ~"\""
 [ \t\r\f\n]+ 	{ /* Se ignoran */}  
 
 /* CUAQUIER OTRO */ 
-.         		{//listar_error(new String(yytext()),yyline,yycolumn);
-				return new Symbol(Tabla_simbolos.error, yycolumn,yyline,new String(yytext()));} 	
+.         		{listar_error(new String(yytext()),yyline,yycolumn);
+				/*return new Symbol(Tabla_simbolos.error, yycolumn,yyline,new String(yytext()));*/} 	
