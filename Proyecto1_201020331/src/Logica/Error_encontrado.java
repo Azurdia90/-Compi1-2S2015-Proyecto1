@@ -7,12 +7,14 @@ package Logica;
 public class Error_encontrado {
     
     private String cadena;
+    private String archivo;
     private String descripcion;
     private int posx;
     private int posy;
     private boolean tipo;
     
     public Error_encontrado(){
+        this.archivo = "";
         this.cadena = "";
         this.descripcion = "";
         this.posx = 0;
@@ -20,7 +22,8 @@ public class Error_encontrado {
         this.tipo = false;
     }
     
-    public Error_encontrado(String c,String d, int x, int y, boolean t){
+    public Error_encontrado(String a,String c,String d, int x, int y, boolean t){
+        this.archivo = a;
         this.cadena = c;
         this.descripcion = d;
         this.posx = x;
@@ -34,6 +37,14 @@ public class Error_encontrado {
 
     public void setCadena(String cadena) {
         this.cadena = cadena;
+    }
+
+    public String getArchivo() {
+        return archivo;
+    }
+
+    public void setArchivo(String archivo) {
+        this.archivo = archivo;
     }
 
     public String getDescripcion() {
@@ -67,5 +78,5 @@ public class Error_encontrado {
     public void setTipo(boolean tipo) {
         this.tipo = tipo;
     }
- 
+
 }//FIN DE LA CLASE DE ERRORES

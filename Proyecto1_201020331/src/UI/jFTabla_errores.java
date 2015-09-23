@@ -20,7 +20,7 @@ public class jFTabla_errores extends javax.swing.JFrame {
     private String[][] datos ;
     private DefaultTableModel dtm;
     private int filas = 0;
-    private final Integer columnas = 5;
+    private final Integer columnas = 6;
     /**
      * Creates new form jFTabla_errores
      */
@@ -34,11 +34,12 @@ public class jFTabla_errores extends javax.swing.JFrame {
     }
     
     public void setear_encabezados(){
-        encabezado[0] = "Tipo";
-        encabezado[1] = "Lexema";
-        encabezado[2] = "Descripción";
-        encabezado[3] = "Posición en x";
-        encabezado[4] = "Posición en y";
+        encabezado[0] = "Archivo";
+        encabezado[1] = "Tipo";
+        encabezado[2] = "Lexema";
+        encabezado[3] = "Descripción";
+        encabezado[4] = "Posición en x";
+        encabezado[5] = "Posición en y";
         setear_contenido();
     }
     
@@ -50,22 +51,25 @@ public class jFTabla_errores extends javax.swing.JFrame {
             for(x=0;x<columnas;x++){
                 switch(x){
                     case 0:
+                        datos[y][x] = Arbol_AST.getLista_errores().get(pos).getArchivo();
+                        break;
+                    case 1:
                         if(Arbol_AST.getLista_errores().get(pos).isTipo() == true){
                             datos[y][x] = "Error Sintactico";
                         }else{
                             datos[y][x] = "Error Lexico";
                         }
                         break;
-                    case 1:
+                    case 2:
                         datos[y][x] = Arbol_AST.getLista_errores().get(pos).getCadena();
                         break;
-                    case 2:
+                    case 3:
                         datos[y][x] = Arbol_AST.getLista_errores().get(pos).getDescripcion();
                         break;
-                    case 3:
+                    case 4:
                         datos[y][x] = Integer.toString(Arbol_AST.getLista_errores().get(pos).getPosx());
                         break;
-                    case 4:
+                    case 5:
                         datos[y][x] = Integer.toString(Arbol_AST.getLista_errores().get(pos).getPosy());
                         break;
                 }//fin del case de las columnas

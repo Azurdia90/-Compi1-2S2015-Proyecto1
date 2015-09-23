@@ -1,18 +1,26 @@
 package UI;
-import Analizadores.*;
+
+
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import Analizadores_configuracion.Lexico_configuracion;
+import Analizadores_configuracion.Sintactico_configuracion;
+import Analizadores.Lexico_escenario;
+import Analizadores.Sintactico_escenario;
+
 /**
  *
  * @author Cristian
  */
 public class jFPrincipal extends javax.swing.JFrame {
 
-    private Lexico analizador_lexico;
-    private Sintactico analizador_sintactico;
+    private Lexico_configuracion analizador_lexico;
+    private Sintactico_configuracion analizador_sintactico;
+    private Lexico_escenario analizador_lexico_escenarios;
+    private Sintactico_escenario analizador_sintactico_escenarios;
     
     public jFPrincipal() {
         initComponents();
@@ -38,7 +46,7 @@ public class jFPrincipal extends javax.swing.JFrame {
         jMISalir = new javax.swing.JMenuItem();
         jMTabla_simbolos = new javax.swing.JMenu();
         jMICompilar_configuraciones = new javax.swing.JMenuItem();
-        jMenuItem7 = new javax.swing.JMenuItem();
+        jMICompilar_escenarios = new javax.swing.JMenuItem();
         jMenuItem8 = new javax.swing.JMenuItem();
         jMenuItem9 = new javax.swing.JMenuItem();
         jMIErrores = new javax.swing.JMenuItem();
@@ -92,8 +100,13 @@ public class jFPrincipal extends javax.swing.JFrame {
         });
         jMTabla_simbolos.add(jMICompilar_configuraciones);
 
-        jMenuItem7.setText("Compilar Archivo de Carga de Escenario");
-        jMTabla_simbolos.add(jMenuItem7);
+        jMICompilar_escenarios.setText("Compilar Archivo de Carga de Escenario");
+        jMICompilar_escenarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMICompilar_escenariosActionPerformed(evt);
+            }
+        });
+        jMTabla_simbolos.add(jMICompilar_escenarios);
 
         jMenuItem8.setText("Compilar Archivo de secuencia de Escenarios");
         jMTabla_simbolos.add(jMenuItem8);
@@ -170,8 +183,8 @@ public class jFPrincipal extends javax.swing.JFrame {
         try{
             String archivo_entrada = jTAEntrada.getText();
             if(!archivo_entrada.isEmpty()){
-                analizador_lexico = new Lexico(new BufferedReader(new StringReader(archivo_entrada)));
-                analizador_sintactico = new Sintactico(analizador_lexico);
+                analizador_lexico = new Lexico_configuracion(new BufferedReader(new StringReader(archivo_entrada)));
+                analizador_sintactico = new Sintactico_configuracion(analizador_lexico);
                 analizador_sintactico.parse();
             }else{
                 JOptionPane.showMessageDialog(null,"NO HAY TEXTO PARA ANALIZAR","Precaución",JOptionPane.WARNING_MESSAGE);
@@ -196,8 +209,25 @@ public class jFPrincipal extends javax.swing.JFrame {
         ventana_tabla_errores.show();
     }//GEN-LAST:event_jMIErroresActionPerformed
 
+    private void jMICompilar_escenariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICompilar_escenariosActionPerformed
+        try{
+            String archivo_entrada = jTAEntrada.getText();
+            if(!archivo_entrada.isEmpty()){
+                analizador_lexico_escenarios = new Lexico_escenario(new BufferedReader(new StringReader(archivo_entrada)));
+                analizador_sintactico_escenarios = new Sintactico_escenario(analizador_lexico_escenarios);
+                analizador_sintactico_escenarios.parse();
+            }else{
+                JOptionPane.showMessageDialog(null,"NO HAY TEXTO PARA ANALIZAR","Precaución",JOptionPane.WARNING_MESSAGE);
+            }
+                       
+        }catch(Exception ex){
+             Logger.getLogger(jFPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMICompilar_escenariosActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem jMICompilar_configuraciones;
+    private javax.swing.JMenuItem jMICompilar_escenarios;
     private javax.swing.JMenuItem jMIErrores;
     private javax.swing.JMenuItem jMISalir;
     private javax.swing.JMenu jMTabla_simbolos;
@@ -212,7 +242,6 @@ public class jFPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JMenuItem jMenuItem8;
     private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JScrollPane jScrollPane1;

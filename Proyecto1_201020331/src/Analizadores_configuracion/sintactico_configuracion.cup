@@ -7,6 +7,7 @@ import java_cup.runtime.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+import Logica.Error_encontrado;
  
 parser code 
 {: 
@@ -59,13 +60,12 @@ private boolean verificar_path(String descripcion){
 /**Metodo al que se llama automáticamente ante algún error sintactico.*/ 
 public void syntax_error(Symbol s){ 
  //System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
- Error_encontrado error_sintactico = new Error_encontrado(s.value.toString(), "", s.left, s.right+1, true);
+ Error_encontrado error_sintactico = new Error_encontrado("Archivo configuracion",s.value.toString(), "", s.left, s.right+1, true);
  Arbol_AST.getLista_errores().add(error_sintactico);
 } 
  /**Metodo al que se llama en el momento en que ya no es posible una recuperación de errores.*/ 
 public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
- Error_encontrado error_sintactico = new Error_encontrado(s.value.toString(),"", s.left, s.right+1, true); 
- Arbol_AST.getLista_errores().add(error_sintactico);
+	System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
 } 
 :} 
 

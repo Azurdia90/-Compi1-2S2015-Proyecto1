@@ -1,0 +1,109 @@
+package Analizadores; 
+
+import java.io.File;
+import Logica.Objeto;
+import Logica.Arbol_AST;
+import java_cup.runtime.*; 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.swing.JOptionPane;
+import Logica.Error_encontrado;
+ 
+parser code 
+{: 
+
+//variables utilizadas para el analisis sintactico
+private boolean estado = true;
+private Objeto objeto = null;
+
+public boolean getEstado(){
+	return estado;
+}
+
+
+/**Metodo al que se llama automáticamente ante algún error sintactico.*/ 
+public void syntax_error(Symbol s){ 
+ //System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
+ Error_encontrado error_sintactico = new Error_encontrado(s.value.toString(), "", s.left, s.right+1, true);
+ Arbol_AST.getLista_errores().add(error_sintactico);
+} 
+ /**Metodo al que se llama en el momento en que ya no es posible una recuperación de errores.*/ 
+public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+	System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
+} 
+:} 
+
+terminal abrir_tag, r_escenario, r_nombre, r_fondo, r_ancho, r_alto, r_personajes, r_heroes, r_villanos, r_paredes, r_suelo, 
+r_extras, r_armas, r_bonus, r_meta, s_igual, s_punto_coma, s_guion, cerrar_tag, abrir_p, atributo_nombre, numero, s_dospuntos,
+s_coma, cerrar_p;
+
+non terminal INICIO, ARCHIVO_ESCENARIO, ESCENARIO, CONFIGURACION_ESCENARIO, PERSONAJE, PAREDES, SUELO, EXTRAS, META, 
+CONFIGURACION_PERSONAJE, CONFIGURACION_EXTRAS, DECLARACION_MULTIPLE1, DECLARACION_MULTIPLE2, DECLARACION2, DECLARACION1;
+  
+start with INICIO;  
+
+INICIO ::=  ARCHIVO_ESCENARIO 			
+			{:
+			if(parser.estado == true){
+                JOptionPane.showMessageDialog(null,"NO SE HAN ENCONTRADO "
+                + "ERRORES","EXITO",JOptionPane.WARNING_MESSAGE);	
+			}else{
+     			JOptionPane.showMessageDialog(null,"EXISTEN ERRORES LEXICOS O "
+                + "SINTACTICOS\n CONSULTE EL AREA DE ERRORES"
+                + "","ERROR",JOptionPane.ERROR_MESSAGE);
+			} 
+			:};
+
+ARCHIVO_ESCENARIO ::= 	ARCHIVO_ESCENARIO ESCENARIO 
+						|ESCENARIO;
+
+ESCENARIO ::=	abrir_tag r_escenario r_nombre s_igual atributo_nombre s_punto_coma r_fondo s_igual atributo_nombre s_punto_coma
+				r_ancho s_igual numero s_punto_coma r_alto s_igual numero cerrar_tag CONFIGURACION_ESCENARIO abrir_tag s_guion 
+				r_escenario cerrar_tag;
+
+
+CONFIGURACION_ESCENARIO ::= CONFIGURACION_ESCENARIO PERSONAJE
+							|CONFIGURACION_ESCENARIO PAREDES 
+							|CONFIGURACION_ESCENARIO SUELO 
+							|CONFIGURACION_ESCENARIO EXTRAS 
+							|CONFIGURACION_ESCENARIO META
+							|PERSONAJE
+							|PAREDES
+							|SUELO
+							|EXTRAS
+							|META;
+
+PERSONAJE ::= abrir_tag r_personajes cerrar_tag CONFIGURACION_PERSONAJE abrir_tag s_guion r_personajes cerrar_tag;
+
+PAREDES ::= abrir_tag r_paredes cerrar_tag DECLARACION_MULTIPLE2 abrir_tag s_guion r_paredes cerrar_tag;
+
+SUELO ::= abrir_tag r_suelo cerrar_tag DECLARACION_MULTIPLE2 abrir_tag s_guion r_suelo cerrar_tag;
+
+EXTRAS ::= abrir_tag r_extras cerrar_tag CONFIGURACION_EXTRAS abrir_tag s_guion r_extras cerrar_tag;
+
+META ::= abrir_tag r_meta cerrar_tag DECLARACION1 abrir_tag s_guion r_meta cerrar_tag;
+
+CONFIGURACION_PERSONAJE ::= abrir_tag r_heroes cerrar_tag DECLARACION1 abrir_tag s_guion r_heroes cerrar_tag
+							 abrir_tag r_villanos cerrar_tag  DECLARACION_MULTIPLE1 abrir_tag s_guion r_villanos cerrar_tag
+							|abrir_tag r_villanos cerrar_tag  DECLARACION_MULTIPLE1 abrir_tag s_guion r_villanos cerrar_tag 
+							abrir_tag r_heroes cerrar_tag DECLARACION1 abrir_tag s_guion r_heroes cerrar_tag;
+
+CONFIGURACION_EXTRAS ::= 	abrir_tag r_armas cerrar_tag DECLARACION_MULTIPLE1 abrir_tag s_guion r_armas cerrar_tag abrir_tag r_bonus cerrar_tag
+							DECLARACION_MULTIPLE1 abrir_tag s_guion r_bonus cerrar_tag
+							|abrir_tag r_bonus cerrar_tag DECLARACION2 abrir_tag s_guion r_bonus cerrar_tag abrir_tag r_armas cerrar_tag 
+							DECLARACION_MULTIPLE1 abrir_tag s_guion r_armas cerrar_tag;
+
+DECLARACION_MULTIPLE1 ::=	DECLARACION_MULTIPLE1 DECLARACION1 
+							|DECLARACION1;
+
+DECLARACION_MULTIPLE2 ::=	DECLARACION_MULTIPLE2 DECLARACION1
+							|DECLARACION_MULTIPLE2 DECLARACION2
+							|DECLARACION1 
+							|DECLARACION2;
+
+
+DECLARACION2 ::=	atributo_nombre abrir_p numero s_dospuntos numero s_coma numero cerrar_p s_punto_coma
+					|atributo_nombre abrir_p numero s_coma numero s_dospuntos numero cerrar_p s_punto_coma;
+
+DECLARACION1 ::= atributo_nombre abrir_p numero s_coma numero cerrar_p s_punto_coma;
+					
