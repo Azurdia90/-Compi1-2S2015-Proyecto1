@@ -9,119 +9,80 @@ import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.SwingConstants;
 import javax.swing.BorderFactory;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author Cristian
  */
 public class jFTabla_simbolos extends javax.swing.JFrame {
     
-    private int dimension_y = 0;
+    private DefaultTableModel tabla_modelo;
+    private String[] encabezado;
+    private String[][] datos;
+    private int filas;
+    private final int columnas = 7;
     
     public jFTabla_simbolos() {
         initComponents();
-        dimension_y = Arbol_AST.getTabla_objetos().size();
-        if(dimension_y > 0){
-            setear_encabezados();
-            crear_matriz_visual();
-        }else{
-            setear_encabezados();
-            crear_matriz_visual_vacia();
-        }
+        encabezado = new String[columnas];
+        filas = Arbol_AST.getTabla_objetos().size();
+        datos = new String[filas][columnas];
+        setear_encabezados();
+        setear_contenido();
+        mostrar_datos();
     }
     
-    public void crear_matriz_visual(){
-        int cont1 = 200;
-        int cont2 = 200;
-        for (Objeto value: Arbol_AST.getTabla_objetos().values()) {
-            crear_columna_imagen(value,cont1);
-            cont1 = cont1 + 200;
-            crear_columna_descripcion(value,cont2);
-            cont2 = cont2 + 200;
-        }
-    }
-    
-    public void crear_columna_imagen(Objeto valor, int pos){
-        JLabel imagen = new JLabel();
-        if(!valor.getImagen().equals("")){
-            imagen.setBounds(100, pos, 200, 200);
-            ImageIcon objeto = new ImageIcon(valor.getImagen());
-            Icon icono = new ImageIcon(objeto.getImage().getScaledInstance(200,200,Image.SCALE_DEFAULT));
-            imagen.setIcon(icono);
-        }else{
-            imagen.setBounds(100, pos, 200, 200);
-            imagen.setBackground(Color.WHITE);
-            imagen.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            imagen.setText("Imagen no disponible");
-            imagen.setHorizontalAlignment(SwingConstants.CENTER);
-            imagen.setVerticalAlignment(SwingConstants.CENTER);
-            imagen.setOpaque(true);
-            imagen.setVisible(true);
-        }
-        jPTabla.add(imagen);
-    }
-    
-    public void crear_columna_descripcion(Objeto valor, int pos){
-        JLabel caracteristica = new JLabel();
-        caracteristica.setBounds(300,pos,300,200);
-        caracteristica.setBackground(Color.WHITE);
-        caracteristica.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        caracteristica.setText("<html>Nombe: "+valor.getNombre() +"<br>"+"Tipo: "+ 
-                valor.getTipo() + "<br>"+"Vida: "+valor.getVida() +"<br>"+
-                "Destruir: "+valor.getDestruir() +"<br>"+"Creditos: "+ 
-                valor.getCreditos() +"<br>"+"Descripcion: "+ valor.getDescripcion()+
-                "</html>");
-        caracteristica.setOpaque(true);
-        caracteristica.setVisible(true);
-        jPTabla.add(caracteristica);
-    }
-    
-    public void crear_matriz_visual_vacia(){
-        JLabel espacio1 = new JLabel();
-        JLabel espacio2 = new JLabel();
-        espacio1.setBounds(100,200,200,100);
-        espacio1.setBackground(Color.WHITE);
-        espacio1.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        espacio1.setVisible(true);
-        espacio1.setOpaque(true);
-        espacio1.setText("Información no disponible");
-        espacio1.setHorizontalAlignment(SwingConstants.CENTER);
-        espacio1.setVerticalAlignment(SwingConstants.CENTER);
-        jPTabla.add(espacio1);
-        espacio2.setBounds(300,200,300,100);
-        espacio2.setBackground(Color.WHITE);
-        espacio2.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        espacio2.setVisible(true);
-        espacio2.setOpaque(true);
-        espacio2.setText("Información no disponible");
-        espacio2.setHorizontalAlignment(SwingConstants.CENTER);
-        espacio2.setVerticalAlignment(SwingConstants.CENTER);
-        jPTabla.add(espacio2);
-    }
     public void setear_encabezados(){
-        JLabel encabezado1;
-        JLabel encabezado2;
-        encabezado1 = new JLabel();
-        encabezado2 = new JLabel();
-        encabezado1.setBounds(100,100,200,100);
-        encabezado1.setBackground(Color.LIGHT_GRAY);
-        encabezado1.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        encabezado1.setVisible(true);
-        encabezado1.setOpaque(true);
-        encabezado1.setText("Imagen");
-        encabezado1.setHorizontalAlignment(SwingConstants.CENTER);
-        encabezado1.setVerticalAlignment(SwingConstants.CENTER);
-        jPTabla.add(encabezado1);
-        encabezado2.setBounds(300,100,300,100);
-        encabezado2.setBackground(Color.LIGHT_GRAY);
-        encabezado2.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        encabezado2.setVisible(true);
-        encabezado2.setOpaque(true);
-        encabezado2.setText("Caracteristicas");
-        encabezado2.setHorizontalAlignment(SwingConstants.CENTER);
-        encabezado2.setVerticalAlignment(SwingConstants.CENTER);
-        jPTabla.add(encabezado2);
+        encabezado[0] = "Tipo";
+        encabezado[1] = "Nombre";
+        encabezado[2] = "Path Imagen";
+        encabezado[3] = "Vida";
+        encabezado[4] = "Destruir";
+        encabezado[5] = "Bonus";
+        encabezado[6] = "Descripcion";
     }//FIN DEL METODO QUE DA VALORES A LOS ENCABEZADOS
 
+    public void setear_contenido(){
+        int contx = 0;
+        int conty = 0;
+        for (Objeto value: Arbol_AST.getTabla_objetos().values()) {
+            for(contx = 0; contx<7; contx++){
+                switch(contx){
+                    case 1:
+                        datos[contx][conty] = value.getTipo();
+                        break;
+                    case 2:
+                        datos[contx][conty] = value.getNombre();
+                        break;
+                    case 3:
+                        datos[contx][conty] = value.getImagen();
+                        break;
+                    case 4:
+                        datos[contx][conty] = Integer.toString(value.getVida());
+                        break;
+                    case 5:
+                        datos[contx][conty] = Integer.toString(value.getDestruir());
+                        break;
+                    case 6:
+                        datos[contx][conty] = value.getDescripcion();
+                        break;
+                }//fin del case para la posicion de las columnas
+                        
+            }//fin del contador de la posicion de las columnas
+
+        }//fin del contador para poder recorrer toda la tabla hash
+    }//fin del seteo de los datos
+    
+    public void mostrar_datos(){
+        if(!Arbol_AST.getTabla_objetos().isEmpty()){
+            tabla_modelo = new DefaultTableModel(datos,encabezado);
+            jTabla_Simbolos.setModel(tabla_modelo);
+        }else{
+            tabla_modelo = new DefaultTableModel(datos,encabezado);
+            jTabla_Simbolos.setModel(tabla_modelo);
+        }
+    }//fin del metodo para cargar la tabla en el jFrame 
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -133,6 +94,8 @@ public class jFTabla_simbolos extends javax.swing.JFrame {
 
         jPTabla = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTabla_Simbolos = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -142,6 +105,19 @@ public class jFTabla_simbolos extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         jLabel1.setText("TABLA DE SIMBOLOS");
 
+        jTabla_Simbolos.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane1.setViewportView(jTabla_Simbolos);
+
         javax.swing.GroupLayout jPTablaLayout = new javax.swing.GroupLayout(jPTabla);
         jPTabla.setLayout(jPTablaLayout);
         jPTablaLayout.setHorizontalGroup(
@@ -150,13 +126,19 @@ public class jFTabla_simbolos extends javax.swing.JFrame {
                 .addGap(179, 179, 179)
                 .addComponent(jLabel1)
                 .addContainerGap(181, Short.MAX_VALUE))
+            .addGroup(jPTablaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane1)
+                .addContainerGap())
         );
         jPTablaLayout.setVerticalGroup(
             jPTablaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPTablaLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(456, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(23, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -177,5 +159,7 @@ public class jFTabla_simbolos extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPTabla;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTabla_Simbolos;
     // End of variables declaration//GEN-END:variables
 }

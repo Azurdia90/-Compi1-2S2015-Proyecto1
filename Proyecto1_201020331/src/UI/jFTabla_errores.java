@@ -15,7 +15,6 @@ import javax.swing.table.DefaultTableModel;
  */
 public class jFTabla_errores extends javax.swing.JFrame {
     
-    private DefaultTableModel tabla_modelo;
     private String[] encabezado;
     private String[][] datos ;
     private DefaultTableModel dtm;

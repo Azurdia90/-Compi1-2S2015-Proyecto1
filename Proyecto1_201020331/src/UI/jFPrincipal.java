@@ -8,8 +8,8 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import Analizadores_configuracion.Lexico_configuracion;
 import Analizadores_configuracion.Sintactico_configuracion;
-import Analizadores.Lexico_escenario;
-import Analizadores.Sintactico_escenario;
+import Analizadores_escenario.Lexico_escenario;
+import Analizadores_escenario.Sintactico_escenario;
 
 /**
  *

@@ -1,0 +1,60 @@
+package Analizadores_escenario; 
+
+
+import Logica.Arbol_AST;
+import java_cup.runtime.*;
+import javax.swing.JOptionPane;
+import Logica.Error_encontrado;
+ 
+parser code 
+{: 
+
+//variables utilizadas para el analisis sintactico
+private boolean estado = true;
+
+
+public boolean getEstado(){
+	return estado;
+}
+
+
+
+/**Metodo al que se llama automáticamente ante algún error sintactico.*/ 
+public void syntax_error(Symbol s){ 
+ //System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
+ Error_encontrado error_sintactico = new Error_encontrado("Archivo Escenario",s.value.toString(), "", s.left, s.right+1, true);
+ Arbol_AST.getLista_errores().add(error_sintactico);
+} 
+ /**Metodo al que se llama en el momento en que ya no es posible una recuperación de errores.*/ 
+public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+	System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
+} 
+:} 
+
+terminal abrir_tag, r_escenarios, r_escenario, r_nombre, r_orden, s_igual, s_punto_coma, s_guion, cerrar_tag, atributo_nombre, numero;
+
+non terminal INICIO, ARCHIVO_SECUENCIA, ORDEN_ESCENARIO, ESCENARIO;
+  
+start with INICIO;  
+
+INICIO ::=  ARCHIVO_SECUENCIA			
+			{:
+			if(parser.estado == true){
+                JOptionPane.showMessageDialog(null,"NO SE HAN ENCONTRADO "
+                + "ERRORES","EXITO",JOptionPane.WARNING_MESSAGE);	
+			}else{
+     			JOptionPane.showMessageDialog(null,"EXISTEN ERRORES LEXICOS O "
+                + "SINTACTICOS\n CONSULTE EL AREA DE ERRORES"
+                + "","ERROR",JOptionPane.ERROR_MESSAGE);
+			} 
+			:};
+
+ARCHIVO_SECUENCIA ::=	abrir_tag r_escenarios cerrar_tag ORDEN_ESCENARIO abrir_tag s_guion r_escenarios cerrar_tag
+						|error{:parser.estado = false;:};
+
+ORDEN_ESCENARIO ::=	ORDEN_ESCENARIO ESCENARIO
+					|ESCENARIO
+					|error{:parser.estado = false;:};
+
+ESCENARIO ::=	abrir_tag r_escenario r_nombre s_igual atributo_nombre:n s_punto_coma r_orden s_igual numero:p s_punto_coma s_guion cerrar_tag
+				{:Arbol_AST.getOrden_escenarios().add(Integer.parseInt(p.toString()),n.toString());:};

@@ -1,11 +1,9 @@
-package Analizadores; 
+package Analizadores_escenario; 
 
-import java.io.File;
-import Logica.Objeto;
+import Logica.Posicion;
+import Logica.Escenario;
 import Logica.Arbol_AST;
-import java_cup.runtime.*; 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java_cup.runtime.*;
 import javax.swing.JOptionPane;
 import Logica.Error_encontrado;
  
@@ -14,17 +12,21 @@ parser code
 
 //variables utilizadas para el analisis sintactico
 private boolean estado = true;
-private Objeto objeto = null;
+private Posicion posicion = null;
+private Escenario escenario  = new Escenario();
 
 public boolean getEstado(){
 	return estado;
 }
 
+public void setEscenario(){
+	escenario = new Escenario();
+}
 
 /**Metodo al que se llama automáticamente ante algún error sintactico.*/ 
 public void syntax_error(Symbol s){ 
  //System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
- Error_encontrado error_sintactico = new Error_encontrado(s.value.toString(), "", s.left, s.right+1, true);
+ Error_encontrado error_sintactico = new Error_encontrado("Archivo Escenario",s.value.toString(), "", s.left, s.right+1, true);
  Arbol_AST.getLista_errores().add(error_sintactico);
 } 
  /**Metodo al que se llama en el momento en que ya no es posible una recuperación de errores.*/ 
@@ -55,7 +57,8 @@ INICIO ::=  ARCHIVO_ESCENARIO
 			:};
 
 ARCHIVO_ESCENARIO ::= 	ARCHIVO_ESCENARIO ESCENARIO 
-						|ESCENARIO;
+						|ESCENARIO
+						|error{:parser.estado = false;:};
 
 ESCENARIO ::=	abrir_tag r_escenario r_nombre s_igual atributo_nombre s_punto_coma r_fondo s_igual atributo_nombre s_punto_coma
 				r_ancho s_igual numero s_punto_coma r_alto s_igual numero cerrar_tag CONFIGURACION_ESCENARIO abrir_tag s_guion 
@@ -71,39 +74,59 @@ CONFIGURACION_ESCENARIO ::= CONFIGURACION_ESCENARIO PERSONAJE
 							|PAREDES
 							|SUELO
 							|EXTRAS
-							|META;
+							|META
+							|error{:parser.estado = false;:};
 
 PERSONAJE ::= abrir_tag r_personajes cerrar_tag CONFIGURACION_PERSONAJE abrir_tag s_guion r_personajes cerrar_tag;
 
-PAREDES ::= abrir_tag r_paredes cerrar_tag DECLARACION_MULTIPLE2 abrir_tag s_guion r_paredes cerrar_tag;
+PAREDES ::= abrir_tag r_paredes cerrar_tag DECLARACION_MULTIPLE2:p1 abrir_tag s_guion r_paredes cerrar_tag
+			{:escenario.getLista_posicion().add((Posicion)p1);:};
 
-SUELO ::= abrir_tag r_suelo cerrar_tag DECLARACION_MULTIPLE2 abrir_tag s_guion r_suelo cerrar_tag;
+SUELO ::= abrir_tag r_suelo cerrar_tag DECLARACION_MULTIPLE2:p1 abrir_tag s_guion r_suelo cerrar_tag
+			{:escenario.getLista_posicion().add((Posicion)p1);:};
 
 EXTRAS ::= abrir_tag r_extras cerrar_tag CONFIGURACION_EXTRAS abrir_tag s_guion r_extras cerrar_tag;
 
-META ::= abrir_tag r_meta cerrar_tag DECLARACION1 abrir_tag s_guion r_meta cerrar_tag;
+META ::= abrir_tag r_meta cerrar_tag DECLARACION1:p1 abrir_tag s_guion r_meta cerrar_tag
+			{:escenario.getLista_posicion().add((Posicion)p1);:};
 
-CONFIGURACION_PERSONAJE ::= abrir_tag r_heroes cerrar_tag DECLARACION1 abrir_tag s_guion r_heroes cerrar_tag
-							 abrir_tag r_villanos cerrar_tag  DECLARACION_MULTIPLE1 abrir_tag s_guion r_villanos cerrar_tag
-							|abrir_tag r_villanos cerrar_tag  DECLARACION_MULTIPLE1 abrir_tag s_guion r_villanos cerrar_tag 
-							abrir_tag r_heroes cerrar_tag DECLARACION1 abrir_tag s_guion r_heroes cerrar_tag;
+CONFIGURACION_PERSONAJE ::= abrir_tag r_heroes cerrar_tag DECLARACION1:p1 abrir_tag s_guion r_heroes cerrar_tag
+							abrir_tag r_villanos cerrar_tag  DECLARACION_MULTIPLE1:p2 abrir_tag s_guion r_villanos cerrar_tag
+							{:escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);:}
+							|abrir_tag r_villanos cerrar_tag  DECLARACION_MULTIPLE1:p1 abrir_tag s_guion r_villanos cerrar_tag 
+							abrir_tag r_heroes cerrar_tag DECLARACION1:p2 abrir_tag s_guion r_heroes cerrar_tag
+							{:escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);:}
+							|error{:parser.estado = false;:};
 
-CONFIGURACION_EXTRAS ::= 	abrir_tag r_armas cerrar_tag DECLARACION_MULTIPLE1 abrir_tag s_guion r_armas cerrar_tag abrir_tag r_bonus cerrar_tag
-							DECLARACION_MULTIPLE1 abrir_tag s_guion r_bonus cerrar_tag
-							|abrir_tag r_bonus cerrar_tag DECLARACION2 abrir_tag s_guion r_bonus cerrar_tag abrir_tag r_armas cerrar_tag 
-							DECLARACION_MULTIPLE1 abrir_tag s_guion r_armas cerrar_tag;
+CONFIGURACION_EXTRAS ::= 	abrir_tag r_armas cerrar_tag DECLARACION_MULTIPLE1:p1 abrir_tag s_guion r_armas cerrar_tag 
+							abrir_tag r_bonus cerrar_tag DECLARACION_MULTIPLE1:p2 abrir_tag s_guion r_bonus cerrar_tag
+							{:escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);:}
+							|abrir_tag r_bonus cerrar_tag DECLARACION_MULTIPLE1:p1 abrir_tag s_guion r_bonus cerrar_tag 
+							abrir_tag r_armas cerrar_tag DECLARACION_MULTIPLE1:p2 abrir_tag s_guion r_armas cerrar_tag
+							{:escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);:}
+							|error {:parser.estado = false;:};
 
-DECLARACION_MULTIPLE1 ::=	DECLARACION_MULTIPLE1 DECLARACION1 
-							|DECLARACION1;
+DECLARACION_MULTIPLE1 ::=	DECLARACION_MULTIPLE1:p1 DECLARACION1:p2 {:escenario.getLista_posicion().add((Posicion)p1); RESULT = p2;:}
+							|DECLARACION1:p 	{:RESULT = p;:}
+							|error{:parser.estado = false;:};
 
-DECLARACION_MULTIPLE2 ::=	DECLARACION_MULTIPLE2 DECLARACION1
-							|DECLARACION_MULTIPLE2 DECLARACION2
-							|DECLARACION1 
-							|DECLARACION2;
+DECLARACION_MULTIPLE2 ::=	DECLARACION_MULTIPLE2:p1 DECLARACION1:p2 	{:escenario.getLista_posicion().add((Posicion)p1); RESULT = p2;:}
+							|DECLARACION_MULTIPLE2:p1 DECLARACION2:p2 	{:escenario.getLista_posicion().add((Posicion)p1); RESULT = p2;:}
+							|DECLARACION1:p {:RESULT = p;:}
+							|DECLARACION2:p {:RESULT = p;:}
+							|error{:parser.estado = false;:};
 
 
-DECLARACION2 ::=	atributo_nombre abrir_p numero s_dospuntos numero s_coma numero cerrar_p s_punto_coma
-					|atributo_nombre abrir_p numero s_coma numero s_dospuntos numero cerrar_p s_punto_coma;
+DECLARACION2 ::=	atributo_nombre:n abrir_p numero:x1 s_dospuntos numero:x2 s_coma numero:y cerrar_p s_punto_coma
+					{:posicion = new Posicion(); posicion.setNombre(n.toString()); posicion.setX_ini(Integer.parseInt(x1.toString()));
+				  	posicion.setX_fin(Integer.parseInt(x2.toString())); posicion.setY_ini(Integer.parseInt(y.toString())); 
+				  	RESULT = posicion;:}
+					|atributo_nombre:n abrir_p numero:x s_coma numero:y1 s_dospuntos numero:y2 cerrar_p s_punto_coma
+					{:posicion = new Posicion(); posicion.setNombre(n.toString()); posicion.setX_ini(Integer.parseInt(x.toString()));
+				  	posicion.setY_ini(Integer.parseInt(y1.toString())); posicion.setY_fin(Integer.parseInt(y2.toString())); 
+				  	RESULT = posicion;:};
 
-DECLARACION1 ::= atributo_nombre abrir_p numero s_coma numero cerrar_p s_punto_coma;
+DECLARACION1 ::= atributo_nombre:n abrir_p numero:x s_coma numero:y cerrar_p s_punto_coma
+				{:posicion = new Posicion(); posicion.setNombre(n.toString()); posicion.setX_ini(Integer.parseInt(x.toString()));
+				  posicion.setY_ini(Integer.parseInt(y.toString())); RESULT = posicion;:};
 					
