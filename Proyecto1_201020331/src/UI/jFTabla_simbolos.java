@@ -2,13 +2,6 @@ package UI;
 
 import Logica.Arbol_AST;
 import Logica.Objeto;
-import java.awt.Color;
-import java.awt.Image;
-import javax.swing.Icon;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.SwingConstants;
-import javax.swing.BorderFactory;
 import javax.swing.table.DefaultTableModel;
 /**
  *
@@ -48,28 +41,30 @@ public class jFTabla_simbolos extends javax.swing.JFrame {
         for (Objeto value: Arbol_AST.getTabla_objetos().values()) {
             for(contx = 0; contx<7; contx++){
                 switch(contx){
+                    case 0:
+                        datos[conty][contx] = value.getTipo();
+                        break;
                     case 1:
-                        datos[contx][conty] = value.getTipo();
+                        datos[conty][contx] = value.getNombre();
                         break;
                     case 2:
-                        datos[contx][conty] = value.getNombre();
+                        datos[conty][contx] = value.getImagen();
                         break;
                     case 3:
-                        datos[contx][conty] = value.getImagen();
+                        datos[conty][contx] = Integer.toString(value.getVida());
                         break;
                     case 4:
-                        datos[contx][conty] = Integer.toString(value.getVida());
+                        datos[conty][contx] = Integer.toString(value.getDestruir());
                         break;
                     case 5:
-                        datos[contx][conty] = Integer.toString(value.getDestruir());
+                        datos[conty][contx] = Integer.toString(value.getCreditos());
                         break;
                     case 6:
-                        datos[contx][conty] = value.getDescripcion();
+                        datos[conty][contx] = value.getDescripcion();
                         break;
                 }//fin del case para la posicion de las columnas
-                        
             }//fin del contador de la posicion de las columnas
-
+            conty = conty + 1;  
         }//fin del contador para poder recorrer toda la tabla hash
     }//fin del seteo de los datos
     
@@ -98,7 +93,7 @@ public class jFTabla_simbolos extends javax.swing.JFrame {
         jTabla_Simbolos = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setResizable(false);
+        setPreferredSize(new java.awt.Dimension(900, 475));
 
         jPTabla.setAutoscrolls(true);
 

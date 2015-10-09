@@ -1,4 +1,4 @@
-package Analizadores;
+package Analizadores_configuracion;
 
 import Logica.Arbol_AST;
 import Logica.Error_encontrado;

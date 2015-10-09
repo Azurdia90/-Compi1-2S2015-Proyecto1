@@ -10,6 +10,17 @@ import Analizadores_configuracion.Lexico_configuracion;
 import Analizadores_configuracion.Sintactico_configuracion;
 import Analizadores_escenario.Lexico_escenario;
 import Analizadores_escenario.Sintactico_escenario;
+import Analizadores_secuencia.Lexico_secuencia;
+import Analizadores_secuencia.Sintactico_secuencia;
+import Logica.Arbol_AST;
+import Logica.Escenario;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 /**
  *
@@ -17,10 +28,15 @@ import Analizadores_escenario.Sintactico_escenario;
  */
 public class jFPrincipal extends javax.swing.JFrame {
 
-    private Lexico_configuracion analizador_lexico;
-    private Sintactico_configuracion analizador_sintactico;
+    private Lexico_configuracion analizador_lexico_configuracion;
+    private Sintactico_configuracion analizador_sintactico_configuracion;
     private Lexico_escenario analizador_lexico_escenarios;
     private Sintactico_escenario analizador_sintactico_escenarios;
+    private Lexico_secuencia analizador_lexico_secuencia;
+    private Sintactico_secuencia analizador_sintactico_secuencia;
+    
+    private JFileChooser manejo_archivos;
+    private File archivo;
     
     public jFPrincipal() {
         initComponents();
@@ -39,16 +55,16 @@ public class jFPrincipal extends javax.swing.JFrame {
         jTAEntrada = new javax.swing.JTextArea();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu2 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jMenuItem4 = new javax.swing.JMenuItem();
+        jMINuevo = new javax.swing.JMenuItem();
+        jMIAbrir = new javax.swing.JMenuItem();
+        jMIGuardar = new javax.swing.JMenuItem();
+        jMIGuardar_como = new javax.swing.JMenuItem();
         jMISalir = new javax.swing.JMenuItem();
         jMTabla_simbolos = new javax.swing.JMenu();
         jMICompilar_configuraciones = new javax.swing.JMenuItem();
         jMICompilar_escenarios = new javax.swing.JMenuItem();
-        jMenuItem8 = new javax.swing.JMenuItem();
-        jMenuItem9 = new javax.swing.JMenuItem();
+        jMICompilar_secuencias = new javax.swing.JMenuItem();
+        jMIInicio = new javax.swing.JMenuItem();
         jMIErrores = new javax.swing.JMenuItem();
         jMenuItem11 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
@@ -56,7 +72,8 @@ public class jFPrincipal extends javax.swing.JFrame {
         jMenuItem13 = new javax.swing.JMenuItem();
         jMenuItem14 = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("EDITOR DE JUEGOS");
 
         jTAEntrada.setColumns(20);
         jTAEntrada.setRows(5);
@@ -64,20 +81,41 @@ public class jFPrincipal extends javax.swing.JFrame {
 
         jMenu2.setText("Archivo");
 
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItem1.setText("Nuevo");
-        jMenu2.add(jMenuItem1);
+        jMINuevo.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_MASK));
+        jMINuevo.setText("Nuevo");
+        jMINuevo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMINuevoActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMINuevo);
 
-        jMenuItem2.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItem2.setText("Abrir");
-        jMenu2.add(jMenuItem2);
+        jMIAbrir.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_MASK));
+        jMIAbrir.setText("Abrir");
+        jMIAbrir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIAbrirActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMIAbrir);
 
-        jMenuItem3.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItem3.setText("Guardar");
-        jMenu2.add(jMenuItem3);
+        jMIGuardar.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.CTRL_MASK));
+        jMIGuardar.setText("Guardar");
+        jMIGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIGuardarActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMIGuardar);
 
-        jMenuItem4.setText("Guardar Como");
-        jMenu2.add(jMenuItem4);
+        jMIGuardar_como.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_G, java.awt.event.InputEvent.SHIFT_MASK | java.awt.event.InputEvent.CTRL_MASK));
+        jMIGuardar_como.setText("Guardar Como");
+        jMIGuardar_como.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIGuardar_comoActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jMIGuardar_como);
 
         jMISalir.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
         jMISalir.setText("Salir");
@@ -108,16 +146,21 @@ public class jFPrincipal extends javax.swing.JFrame {
         });
         jMTabla_simbolos.add(jMICompilar_escenarios);
 
-        jMenuItem8.setText("Compilar Archivo de secuencia de Escenarios");
-        jMTabla_simbolos.add(jMenuItem8);
-
-        jMenuItem9.setText("Ejecutar juego");
-        jMenuItem9.addActionListener(new java.awt.event.ActionListener() {
+        jMICompilar_secuencias.setText("Compilar Archivo de secuencia de Escenarios");
+        jMICompilar_secuencias.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem9ActionPerformed(evt);
+                jMICompilar_secuenciasActionPerformed(evt);
             }
         });
-        jMTabla_simbolos.add(jMenuItem9);
+        jMTabla_simbolos.add(jMICompilar_secuencias);
+
+        jMIInicio.setText("Ejecutar juego");
+        jMIInicio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMIInicioActionPerformed(evt);
+            }
+        });
+        jMTabla_simbolos.add(jMIInicio);
 
         jMIErrores.setText("Errores");
         jMIErrores.addActionListener(new java.awt.event.ActionListener() {
@@ -170,10 +213,74 @@ public class jFPrincipal extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jMenuItem9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem9ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jMenuItem9ActionPerformed
+    
+     public void manejar_archivo(){
+        manejo_archivos = new JFileChooser();
+        int resultado = 0;
+        FileNameExtensionFilter extension = new FileNameExtensionFilter("*.conf", "conf");
+        manejo_archivos.setDialogTitle("Abrir Archivo");
+        manejo_archivos.setDialogType(JFileChooser.OPEN_DIALOG);
+        manejo_archivos.setFileFilter(extension);
+        resultado = manejo_archivos.showOpenDialog(null);
+        if(resultado == manejo_archivos.CANCEL_OPTION){
+            archivo = null;
+        }else if(resultado == manejo_archivos.APPROVE_OPTION){
+            archivo = manejo_archivos.getSelectedFile().getAbsoluteFile();
+        }      
+    }
+    
+    public void guardar_archivo(){
+        try{
+             String aux = jTAEntrada.getText();
+            manejo_archivos = new JFileChooser();
+            FileNameExtensionFilter extension = new FileNameExtensionFilter("*.conf", "conf");
+            manejo_archivos.setDialogTitle("Guardar Como");
+            manejo_archivos.setDialogType(JFileChooser.SAVE_DIALOG);
+            manejo_archivos.setFileFilter(extension);
+            int resultado = manejo_archivos.showOpenDialog(null);
+            if(resultado == manejo_archivos.APPROVE_OPTION){
+                archivo = manejo_archivos.getSelectedFile();
+                FileWriter  escribir = new FileWriter(archivo + ".conf");
+                BufferedWriter escribir2 = new BufferedWriter(escribir);
+                String[] lineas = aux.split("\n");
+                    int tam = lineas.length;
+                    for (int i = 0; i < tam; i++) {
+                        escribir2.write(lineas[i] + "\n");
+                    }
+                    escribir2.close();
+            }
+        }catch(Exception e){
+             JOptionPane.showMessageDialog(null, "A ocurrido un error guardar el documento: "
+                        + e);
+        }
+    }//fin del metodo guardar archivo
+    
+    public void graficar_escenario(int cont){
+        int c = 0;
+        if(Arbol_AST.getOrden_escenarios().containsKey(cont)){
+            String nombre_escenario = Arbol_AST.getOrden_escenarios().get(cont);
+            for(c=0; c<Arbol_AST.getLista_escenarios().size();c++){
+                if(Arbol_AST.getLista_escenarios().get(c).getNombre().equals(nombre_escenario)){
+                    Escenario escenario = Arbol_AST.getLista_escenarios().get(c);
+                    JFJuego juego = new JFJuego(escenario);
+                    juego.show();
+                }
+            } 
+        }else{
+           graficar_escenario(cont+1); 
+        }
+    }
+    
+    private void jMIInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIInicioActionPerformed
+        int cont = 1;
+        if(!Arbol_AST.getTabla_objetos().isEmpty() && 
+                !Arbol_AST.getOrden_escenarios().isEmpty() &&
+                        !Arbol_AST.getLista_escenarios().isEmpty()){
+            graficar_escenario(cont); 
+        }else{
+            JOptionPane.showMessageDialog(null,"FALTAN PARAMETROS POR INGRESAR","Precaución",JOptionPane.WARNING_MESSAGE);
+        }
+    }//GEN-LAST:event_jMIInicioActionPerformed
 
     private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
         // TODO add your handling code here:
@@ -183,9 +290,9 @@ public class jFPrincipal extends javax.swing.JFrame {
         try{
             String archivo_entrada = jTAEntrada.getText();
             if(!archivo_entrada.isEmpty()){
-                analizador_lexico = new Lexico_configuracion(new BufferedReader(new StringReader(archivo_entrada)));
-                analizador_sintactico = new Sintactico_configuracion(analizador_lexico);
-                analizador_sintactico.parse();
+                analizador_lexico_configuracion = new Lexico_configuracion(new BufferedReader(new StringReader(archivo_entrada)));
+                analizador_sintactico_configuracion = new Sintactico_configuracion(analizador_lexico_configuracion);
+                analizador_sintactico_configuracion.parse();
             }else{
                 JOptionPane.showMessageDialog(null,"NO HAY TEXTO PARA ANALIZAR","Precaución",JOptionPane.WARNING_MESSAGE);
             }
@@ -225,25 +332,73 @@ public class jFPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jMICompilar_escenariosActionPerformed
 
+    private void jMICompilar_secuenciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMICompilar_secuenciasActionPerformed
+        try{
+            String archivo_entrada = jTAEntrada.getText();
+            if(!archivo_entrada.isEmpty()){
+                analizador_lexico_secuencia = new Lexico_secuencia(new BufferedReader(new StringReader(archivo_entrada)));
+                analizador_sintactico_secuencia = new Sintactico_secuencia(analizador_lexico_secuencia);
+                analizador_sintactico_secuencia.parse();
+            }else{
+                JOptionPane.showMessageDialog(null,"NO HAY TEXTO PARA ANALIZAR","Precaución",JOptionPane.WARNING_MESSAGE);
+            }
+        }catch(Exception ex){
+            Logger.getLogger(jFPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMICompilar_secuenciasActionPerformed
+
+    private void jMIAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIAbrirActionPerformed
+        manejar_archivo();
+        //jTAEntrada.setContentType("text");
+        if(archivo.exists()){ //verificamos que el archivo abierto existe
+            try{
+                BufferedReader leer = new BufferedReader(new FileReader(archivo));
+                StringBuffer leer_cadena = new StringBuffer();
+                String cadena_entrada = null;
+                jTAEntrada.setText("");
+                while((cadena_entrada = leer.readLine()) != null ){
+                    leer_cadena.append(cadena_entrada + "\n");
+                }
+                jTAEntrada.setText(leer_cadena.toString());
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null, "error al cargar archivo");
+            }
+        }else{ //de lo contrario desplegamos un dialogo adviertiendo
+            JOptionPane.showMessageDialog(null, "archivo no existe");
+        }
+    }//GEN-LAST:event_jMIAbrirActionPerformed
+
+    private void jMINuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMINuevoActionPerformed
+        jTAEntrada.setText("");
+    }//GEN-LAST:event_jMINuevoActionPerformed
+
+    private void jMIGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIGuardarActionPerformed
+        guardar_archivo();
+    }//GEN-LAST:event_jMIGuardarActionPerformed
+
+    private void jMIGuardar_comoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMIGuardar_comoActionPerformed
+        guardar_archivo();
+    }//GEN-LAST:event_jMIGuardar_comoActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenuItem jMIAbrir;
     private javax.swing.JMenuItem jMICompilar_configuraciones;
     private javax.swing.JMenuItem jMICompilar_escenarios;
+    private javax.swing.JMenuItem jMICompilar_secuencias;
     private javax.swing.JMenuItem jMIErrores;
+    private javax.swing.JMenuItem jMIGuardar;
+    private javax.swing.JMenuItem jMIGuardar_como;
+    private javax.swing.JMenuItem jMIInicio;
+    private javax.swing.JMenuItem jMINuevo;
     private javax.swing.JMenuItem jMISalir;
     private javax.swing.JMenu jMTabla_simbolos;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem13;
     private javax.swing.JMenuItem jMenuItem14;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
-    private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem8;
-    private javax.swing.JMenuItem jMenuItem9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTAEntrada;
     // End of variables declaration//GEN-END:variables

@@ -23,6 +23,29 @@ public void setEscenario(){
 	escenario = new Escenario();
 }
 
+public void agregar_posicion(Posicion p){
+	if(Arbol_AST.getTabla_objetos().containsKey(p.getNombre())){
+		escenario.getLista_posicion().add(p);
+	}
+}
+
+public void insertar_escenario(Escenario esc){
+
+	boolean encontrado = false;
+	int cont = 0;
+	for(cont = 0; cont > Arbol_AST.getLista_escenarios().size(); cont++){
+            if(Arbol_AST.getLista_escenarios().get(cont).getNombre().equals(esc.getNombre())){
+                Arbol_AST.getLista_escenarios().add(cont, esc);
+                encontrado = true;
+                break;
+            }//verifico que si el escenario existe, si es asi, sobrescribo
+	}//fin del contador para recorrer la lista de escenarios
+        if(encontrado == false){
+            Arbol_AST.getLista_escenarios().add(cont, esc);
+        }//si no fue encontrado en la lista se agrega al final
+		
+}//fin del metodo para almacenar escenarios
+
 /**Metodo al que se llama automáticamente ante algún error sintactico.*/ 
 public void syntax_error(Symbol s){ 
  //System.out.println("Error en la Línea " + (s.right+1) +" Columna " +s.left+ ". Identificador " +s.value + " no reconocido." ); 
@@ -60,9 +83,16 @@ ARCHIVO_ESCENARIO ::= 	ARCHIVO_ESCENARIO ESCENARIO
 						|ESCENARIO
 						|error{:parser.estado = false;:};
 
-ESCENARIO ::=	abrir_tag r_escenario r_nombre s_igual atributo_nombre s_punto_coma r_fondo s_igual atributo_nombre s_punto_coma
-				r_ancho s_igual numero s_punto_coma r_alto s_igual numero cerrar_tag CONFIGURACION_ESCENARIO abrir_tag s_guion 
-				r_escenario cerrar_tag;
+ESCENARIO ::=	abrir_tag r_escenario r_nombre s_igual atributo_nombre:e s_punto_coma r_fondo s_igual atributo_nombre:p s_punto_coma
+				r_ancho s_igual numero:x s_punto_coma r_alto s_igual numero:y cerrar_tag CONFIGURACION_ESCENARIO abrir_tag s_guion 
+				r_escenario cerrar_tag
+				{:
+				escenario.setNombre(e.toString()); 
+				escenario.setFondo(p.toString());
+				escenario.setLargo(Integer.parseInt(x.toString()));
+				escenario.setAncho(Integer.parseInt(y.toString()));
+				insertar_escenario(escenario);
+				:};
 
 
 CONFIGURACION_ESCENARIO ::= CONFIGURACION_ESCENARIO PERSONAJE
@@ -80,22 +110,22 @@ CONFIGURACION_ESCENARIO ::= CONFIGURACION_ESCENARIO PERSONAJE
 PERSONAJE ::= abrir_tag r_personajes cerrar_tag CONFIGURACION_PERSONAJE abrir_tag s_guion r_personajes cerrar_tag;
 
 PAREDES ::= abrir_tag r_paredes cerrar_tag DECLARACION_MULTIPLE2:p1 abrir_tag s_guion r_paredes cerrar_tag
-			{:escenario.getLista_posicion().add((Posicion)p1);:};
+			{:agregar_posicion((Posicion)p1);:};
 
 SUELO ::= abrir_tag r_suelo cerrar_tag DECLARACION_MULTIPLE2:p1 abrir_tag s_guion r_suelo cerrar_tag
-			{:escenario.getLista_posicion().add((Posicion)p1);:};
+			{:agregar_posicion((Posicion)p1);:};
 
 EXTRAS ::= abrir_tag r_extras cerrar_tag CONFIGURACION_EXTRAS abrir_tag s_guion r_extras cerrar_tag;
 
 META ::= abrir_tag r_meta cerrar_tag DECLARACION1:p1 abrir_tag s_guion r_meta cerrar_tag
-			{:escenario.getLista_posicion().add((Posicion)p1);:};
+			{:agregar_posicion((Posicion)p1);:};
 
 CONFIGURACION_PERSONAJE ::= abrir_tag r_heroes cerrar_tag DECLARACION1:p1 abrir_tag s_guion r_heroes cerrar_tag
 							abrir_tag r_villanos cerrar_tag  DECLARACION_MULTIPLE1:p2 abrir_tag s_guion r_villanos cerrar_tag
-							{:escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);:}
+							{:agregar_posicion((Posicion)p1); agregar_posicion((Posicion)p2);:}
 							|abrir_tag r_villanos cerrar_tag  DECLARACION_MULTIPLE1:p1 abrir_tag s_guion r_villanos cerrar_tag 
 							abrir_tag r_heroes cerrar_tag DECLARACION1:p2 abrir_tag s_guion r_heroes cerrar_tag
-							{:escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);:}
+							{:agregar_posicion((Posicion)p1); agregar_posicion((Posicion)p2);:}
 							|error{:parser.estado = false;:};
 
 CONFIGURACION_EXTRAS ::= 	abrir_tag r_armas cerrar_tag DECLARACION_MULTIPLE1:p1 abrir_tag s_guion r_armas cerrar_tag 
@@ -106,12 +136,12 @@ CONFIGURACION_EXTRAS ::= 	abrir_tag r_armas cerrar_tag DECLARACION_MULTIPLE1:p1 
 							{:escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);:}
 							|error {:parser.estado = false;:};
 
-DECLARACION_MULTIPLE1 ::=	DECLARACION_MULTIPLE1:p1 DECLARACION1:p2 {:escenario.getLista_posicion().add((Posicion)p1); RESULT = p2;:}
+DECLARACION_MULTIPLE1 ::=	DECLARACION_MULTIPLE1:p1 DECLARACION1:p2 {:agregar_posicion((Posicion)p1); RESULT = p2;:}
 							|DECLARACION1:p 	{:RESULT = p;:}
 							|error{:parser.estado = false;:};
 
-DECLARACION_MULTIPLE2 ::=	DECLARACION_MULTIPLE2:p1 DECLARACION1:p2 	{:escenario.getLista_posicion().add((Posicion)p1); RESULT = p2;:}
-							|DECLARACION_MULTIPLE2:p1 DECLARACION2:p2 	{:escenario.getLista_posicion().add((Posicion)p1); RESULT = p2;:}
+DECLARACION_MULTIPLE2 ::=	DECLARACION_MULTIPLE2:p1 DECLARACION1:p2 	{:agregar_posicion((Posicion)p1); RESULT = p2;:}
+							|DECLARACION_MULTIPLE2:p1 DECLARACION2:p2 	{:agregar_posicion((Posicion)p1); RESULT = p2;:}
 							|DECLARACION1:p {:RESULT = p;:}
 							|DECLARACION2:p {:RESULT = p;:}
 							|error{:parser.estado = false;:};

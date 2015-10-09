@@ -23,7 +23,7 @@ atributo_nombre = {letra}({letra}|{numero}|"_")*
 %{
 //codigo que se utilizara en el analizador lexico
 private void listar_error(String t, int y, int x){
-	Error_encontrado error_lexico = new Error_encontrado(t,"caracter no definido en el lenguaje", x, y, false);
+	Error_encontrado error_lexico = new Error_encontrado("Archivo Escenario",t,"caracter no definido en el lenguaje", x, y, false);
 	Arbol_AST.getLista_errores().add(error_lexico);
 }
 

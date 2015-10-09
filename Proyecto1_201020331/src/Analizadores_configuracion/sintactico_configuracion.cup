@@ -1,4 +1,4 @@
-package Analizadores; 
+package Analizadores_configuracion;
 
 import java.io.File;
 import Logica.Objeto;
@@ -32,23 +32,16 @@ private int verificar_numero(int n_aux){
 private boolean verificar_path(String descripcion){
 	boolean aceptado = false;
 	//se eliminan las comillas que se tienen al inicio y al final de la cadena
-        String path_aux = "";
+    String path_aux = "";
 	String path = descripcion.substring(1,descripcion.length()-1);
-        if(path.indexOf("/") > -1 ){
-            path_aux = path.replaceAll("/","\\");
-        }
-	//Utilizando Regex se verifica que sea un path y no una descripcion
-	Pattern patron = Pattern.compile("^(?:[\\w]\\:|\\\\)(\\\\[a-z_\\-\\s0-9\\.]+)+\\.(jpg|gif|bmp|raw|jpeg|png|tif)$");
-	Matcher analizador = patron.matcher(path);
-	if(analizador.find()){
-		File imagen  = new File(path);
-		if(imagen.exists()){
-			//se guarda la imagen
-			aceptado = true;
-		}else{
-			//el path no existe pero si es un path
-			aceptado = true;
-		}
+    if(path.indexOf("/") > -1 ){
+        path_aux = path.replaceAll("/","\\");
+    }
+
+	File imagen  = new File(path);
+	if(imagen.exists()){
+		//se guarda la imagen
+		aceptado = true;
 	}else{
 		aceptado = false;
 		estado = false;
@@ -93,22 +86,13 @@ INICIO ::=  ARCHIVO_CONFIGURACION
 ARCHIVO_CONFIGURACION ::= abrir_tag r_configuracion cerrar_tag CONFIGURACION abrir_tag s_guion r_configuracion cerrar_tag
 							|error{:parser.estado = false;:};
 			
-CONFIGURACION ::=	abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
-					abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag
-					abrir_tag r_figura cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_figura cerrar_tag
-				   	|abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag
-				   	abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
-					abrir_tag r_figura cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_figura cerrar_tag
-					|abrir_tag r_figura cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_figura cerrar_tag 
-					abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag
-				   	abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
-				   	|abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag
-				   	abrir_tag r_figura cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_figura cerrar_tag
-				   	abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
-				   	|abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_guion r_fondo cerrar_tag
-				   	abrir_tag r_figura cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_figura cerrar_tag
-				   	abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag
-				   	|error;
+CONFIGURACION ::=	CONFIGURACION abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_guion r_fondo cerrar_tag {:System.out.println("Se lleno la casilla fondo");:}
+					|CONFIGURACION abrir_tag r_figura cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_figura cerrar_tag {:System.out.println("se lleno la casilla figura");:}
+					|CONFIGURACION abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag {:System.out.println("se lleno la casilla diseño");:}
+					|abrir_tag r_fondo cerrar_tag CONFIGURACION_FONDO abrir_tag s_guion r_fondo cerrar_tag{:System.out.println("Se lleno la casilla fondo");:}
+				   	|abrir_tag r_figura cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_figura cerrar_tag{:System.out.println("se lleno la casilla figura");:}
+				   	|abrir_tag r_disenio cerrar_tag DECLARAR_ATRIBUTOS abrir_tag s_guion r_disenio cerrar_tag{:System.out.println("se lleno la casilla diseño");:}
+				   	|error{:parser.estado = false;:};
 
 CONFIGURACION_FONDO ::=	llave_abrir FONDO:f llave_cerrar s_coma CONFIGURACION_FONDO
 						{:Arbol_AST.getTabla_objetos().put(f.getNombre(), f);:}
@@ -137,18 +121,18 @@ FONDO ::=	r_nombre s_igual atributo_nombre:n s_punto_coma r_imagen s_igual descr
 			}
 			:};
 			
-DECLARAR_ATRIBUTOS ::=  llave_abrir ATRIBUTOS:a llave_cerrar s_coma DECLARAR_ATRIBUTOS
+DECLARAR_ATRIBUTOS ::=  llave_abrir ATRIBUTOS:a llave_cerrar  s_coma DECLARAR_ATRIBUTOS
 						{:Arbol_AST.getTabla_objetos().put(a.getNombre(), a);:}
 						|llave_abrir ATRIBUTOS:a llave_cerrar {:Arbol_AST.getTabla_objetos().put(a.getNombre(), a);:}
 						|error{:parser.estado = false;:}; 
 
-ATRIBUTOS ::= 	ATRIBUTO_NOMBRE:n ATRIBUTOS:a 		{:a.setNombre(n.toString()); RESULT = a;:}
-				|ATRIBUTO_VIDA:v ATRIBUTOS:a 		{:a.setVida(Integer.parseInt(v.toString())); RESULT = a;:}
-				|ATRIBUTO_DESTRUIR:d ATRIBUTOS:a 	{:a.setDestruir(Integer.parseInt(d.toString())); RESULT = a;:}
-				|ATRIBUTO_CREDITOS:d ATRIBUTOS:a 	{:a.setCreditos(Integer.parseInt(d.toString())); RESULT = a;:}
-				|ATRIBUTO_IMAGEN:i ATRIBUTOS:a 		{:a.setImagen(i.toString()); RESULT = a;:}
-				|ATRIBUTO_TIPO:t ATRIBUTOS:a 		{:a.setTipo(t.toString()); RESULT = a;:}
-				|ATRIBUTO_DESCRIPCION:d ATRIBUTOS:a {:a.setDescripcion(d.toString()); RESULT = a;:}
+ATRIBUTOS ::= 	ATRIBUTOS:a ATRIBUTO_NOMBRE:n 		{:a.setNombre(n.toString()); RESULT = a;:}
+				|ATRIBUTOS:a ATRIBUTO_VIDA:v  		{:a.setVida(Integer.parseInt(v.toString())); RESULT = a;:}
+				|ATRIBUTOS:a ATRIBUTO_DESTRUIR:d  	{:a.setDestruir(Integer.parseInt(d.toString())); RESULT = a;:}
+				|ATRIBUTOS:a ATRIBUTO_CREDITOS:d 	{:a.setCreditos(Integer.parseInt(d.toString())); RESULT = a;:}
+				|ATRIBUTOS:a ATRIBUTO_IMAGEN:i 		{:a.setImagen(i.toString()); RESULT = a;:}
+				|ATRIBUTOS:a ATRIBUTO_TIPO:t 		{:a.setTipo(t.toString()); RESULT = a;:}
+				|ATRIBUTOS:a ATRIBUTO_DESCRIPCION:d {:a.setDescripcion(d.toString()); RESULT = a;:}
 				|ATRIBUTO_NOMBRE:a      {:objeto = new Objeto(); objeto.setNombre(a.toString()); RESULT = objeto;:}
 				|ATRIBUTO_VIDA:a		{:objeto = new Objeto(); objeto.setVida(Integer.parseInt(a.toString())); RESULT = objeto;:}
 				|ATRIBUTO_DESTRUIR:a	{:objeto = new Objeto(); objeto.setDestruir(Integer.parseInt(a.toString())); RESULT = objeto;:}
@@ -158,7 +142,10 @@ ATRIBUTOS ::= 	ATRIBUTO_NOMBRE:n ATRIBUTOS:a 		{:a.setNombre(n.toString()); RESU
 				|ATRIBUTO_DESCRIPCION:a {:objeto = new Objeto(); objeto.setDescripcion(a.toString()); RESULT = objeto;:};
 
 				   	
-ATRIBUTO_NOMBRE ::= r_nombre s_igual atributo_nombre:n s_punto_coma{:RESULT = n.toString();:};
+ATRIBUTO_NOMBRE ::= r_nombre s_igual atributo_nombre:n s_punto_coma
+					{:
+					RESULT = n;
+					:};
 
 ATRIBUTO_DESTRUIR ::= r_destruir s_igual numero:n s_punto_coma
 						{:
@@ -181,13 +168,13 @@ ATRIBUTO_CREDITOS ::= r_creditos s_igual numero:n s_punto_coma
 ATRIBUTO_IMAGEN ::= r_imagen s_igual descripcion:p s_punto_coma 
 					{:
 					if(verificar_path(p.toString())== true){
-						RESULT = p.toString();
+						RESULT = p;
 					}else{
 						RESULT = "";
 					}
 					:};
  		
-ATRIBUTO_TIPO  ::= r_tipo s_igual TIPO:t s_punto_coma {:RESULT = t.toString();:}
+ATRIBUTO_TIPO  ::= r_tipo s_igual TIPO:t s_punto_coma {:RESULT = t;:}
 					|error{:parser.estado = false;:};
 
 ATRIBUTO_DESCRIPCION ::= r_descripcion s_igual descripcion:d s_punto_coma{:RESULT = d.toString();:};

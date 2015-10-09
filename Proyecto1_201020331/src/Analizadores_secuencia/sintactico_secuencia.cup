@@ -1,4 +1,4 @@
-package Analizadores_escenario; 
+package Analizadores_secuencia; 
 
 
 import Logica.Arbol_AST;
@@ -16,7 +16,6 @@ private boolean estado = true;
 public boolean getEstado(){
 	return estado;
 }
-
 
 
 /**Metodo al que se llama automáticamente ante algún error sintactico.*/ 
@@ -57,4 +56,4 @@ ORDEN_ESCENARIO ::=	ORDEN_ESCENARIO ESCENARIO
 					|error{:parser.estado = false;:};
 
 ESCENARIO ::=	abrir_tag r_escenario r_nombre s_igual atributo_nombre:n s_punto_coma r_orden s_igual numero:p s_punto_coma s_guion cerrar_tag
-				{:Arbol_AST.getOrden_escenarios().add(Integer.parseInt(p.toString()),n.toString());:};
+				{:Arbol_AST.getOrden_escenarios().put(Integer.parseInt(p.toString()),n.toString());:};
