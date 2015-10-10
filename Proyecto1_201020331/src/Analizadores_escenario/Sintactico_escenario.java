@@ -571,7 +571,10 @@ class CUP$Sintactico_escenario$actions {
 		int p2left = ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).left;
 		int p2right = ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).right;
 		Object p2 = (Object)((java_cup.runtime.Symbol) CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).value;
-		agregar_posicion((Posicion)p1); agregar_posicion((Posicion)p2);
+		
+							agregar_posicion((Posicion)p1); 
+							agregar_posicion((Posicion)p2);
+							
               CUP$Sintactico_escenario$result = parser.getSymbolFactory().newSymbol("CONFIGURACION_PERSONAJE",9, ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-15)), ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.peek()), RESULT);
             }
           return CUP$Sintactico_escenario$result;
@@ -586,7 +589,10 @@ class CUP$Sintactico_escenario$actions {
 		int p2left = ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).left;
 		int p2right = ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).right;
 		Object p2 = (Object)((java_cup.runtime.Symbol) CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).value;
-		agregar_posicion((Posicion)p1); agregar_posicion((Posicion)p2);
+		
+							agregar_posicion((Posicion)p1); 
+							agregar_posicion((Posicion)p2);
+							
               CUP$Sintactico_escenario$result = parser.getSymbolFactory().newSymbol("CONFIGURACION_PERSONAJE",9, ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-15)), ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.peek()), RESULT);
             }
           return CUP$Sintactico_escenario$result;
@@ -610,7 +616,10 @@ class CUP$Sintactico_escenario$actions {
 		int p2left = ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).left;
 		int p2right = ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).right;
 		Object p2 = (Object)((java_cup.runtime.Symbol) CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).value;
-		escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);
+		
+							agregar_posicion((Posicion)p1); 
+							agregar_posicion((Posicion)p2);
+							
               CUP$Sintactico_escenario$result = parser.getSymbolFactory().newSymbol("CONFIGURACION_EXTRAS",10, ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-15)), ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.peek()), RESULT);
             }
           return CUP$Sintactico_escenario$result;
@@ -625,7 +634,10 @@ class CUP$Sintactico_escenario$actions {
 		int p2left = ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).left;
 		int p2right = ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).right;
 		Object p2 = (Object)((java_cup.runtime.Symbol) CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-4)).value;
-		escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);
+		
+							agregar_posicion((Posicion)p1); 
+							agregar_posicion((Posicion)p2);
+							
               CUP$Sintactico_escenario$result = parser.getSymbolFactory().newSymbol("CONFIGURACION_EXTRAS",10, ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.elementAt(CUP$Sintactico_escenario$top-15)), ((java_cup.runtime.Symbol)CUP$Sintactico_escenario$stack.peek()), RESULT);
             }
           return CUP$Sintactico_escenario$result;

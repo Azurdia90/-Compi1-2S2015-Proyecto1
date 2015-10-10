@@ -122,18 +122,30 @@ META ::= abrir_tag r_meta cerrar_tag DECLARACION1:p1 abrir_tag s_guion r_meta ce
 
 CONFIGURACION_PERSONAJE ::= abrir_tag r_heroes cerrar_tag DECLARACION1:p1 abrir_tag s_guion r_heroes cerrar_tag
 							abrir_tag r_villanos cerrar_tag  DECLARACION_MULTIPLE1:p2 abrir_tag s_guion r_villanos cerrar_tag
-							{:agregar_posicion((Posicion)p1); agregar_posicion((Posicion)p2);:}
+							{:
+							agregar_posicion((Posicion)p1); 
+							agregar_posicion((Posicion)p2);
+							:}
 							|abrir_tag r_villanos cerrar_tag  DECLARACION_MULTIPLE1:p1 abrir_tag s_guion r_villanos cerrar_tag 
 							abrir_tag r_heroes cerrar_tag DECLARACION1:p2 abrir_tag s_guion r_heroes cerrar_tag
-							{:agregar_posicion((Posicion)p1); agregar_posicion((Posicion)p2);:}
+							{:
+							agregar_posicion((Posicion)p1); 
+							agregar_posicion((Posicion)p2);
+							:}
 							|error{:parser.estado = false;:};
 
 CONFIGURACION_EXTRAS ::= 	abrir_tag r_armas cerrar_tag DECLARACION_MULTIPLE1:p1 abrir_tag s_guion r_armas cerrar_tag 
 							abrir_tag r_bonus cerrar_tag DECLARACION_MULTIPLE1:p2 abrir_tag s_guion r_bonus cerrar_tag
-							{:escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);:}
+							{:
+							agregar_posicion((Posicion)p1); 
+							agregar_posicion((Posicion)p2);
+							:}
 							|abrir_tag r_bonus cerrar_tag DECLARACION_MULTIPLE1:p1 abrir_tag s_guion r_bonus cerrar_tag 
 							abrir_tag r_armas cerrar_tag DECLARACION_MULTIPLE1:p2 abrir_tag s_guion r_armas cerrar_tag
-							{:escenario.getLista_posicion().add((Posicion)p1); escenario.getLista_posicion().add((Posicion)p2);:}
+							{:
+							agregar_posicion((Posicion)p1); 
+							agregar_posicion((Posicion)p2);
+							:}
 							|error {:parser.estado = false;:};
 
 DECLARACION_MULTIPLE1 ::=	DECLARACION_MULTIPLE1:p1 DECLARACION1:p2 {:agregar_posicion((Posicion)p1); RESULT = p2;:}
